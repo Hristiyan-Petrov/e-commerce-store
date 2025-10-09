@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { DataSource } = require('typeorm');
+const { Product } = require('./entity/Product');
 
 const AppDataSource = new DataSource({
     type: "postgres",
@@ -10,8 +11,8 @@ const AppDataSource = new DataSource({
     database: process.env.POSTGRES_DATABASE,
     ssl: true,
     synchronize: true,
-    logging: true,
-    entities: [],
+    // logging: true,
+    entities: [Product],
     subscribers: [],
     migrations: [],
 });

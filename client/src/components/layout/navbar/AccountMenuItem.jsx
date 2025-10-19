@@ -1,6 +1,6 @@
 import { IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { useNavigate } from "react-router";
 
 export default function AccountMenuItem() {
@@ -20,7 +20,7 @@ export default function AccountMenuItem() {
                 aria-label="personal account"
                 onClick={e => setAccountMenuAnchor(e.currentTarget)}
             >
-                <PersonIcon fontSize="large" />
+                <PersonOutlinedIcon />
             </IconButton>
             <Menu
                 anchorEl={accountMenuAnchor}

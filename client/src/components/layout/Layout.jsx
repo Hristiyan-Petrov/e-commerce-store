@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import MainNavigation from '../home/MainNavigation';
+// import MainNavigation from '../home/MainNavigation';
 import { Outlet } from 'react-router';
 import Navbar from './navbar/Navbar';
 

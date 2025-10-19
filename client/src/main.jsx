@@ -9,17 +9,29 @@ import Layout from './components/layout/Layout.jsx';
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#0F3A7D',      // Deep tech blue
-            light: '#4A6FA5',
-            dark: '#051F3E',
-            contrastText: '#fff',
+            main: '#17FBD1',
+            light: '#D6F5F0',
+            dark: '#128771ff',
+            // contrastText: '#fff',
         },
         secondary: {
-            main: '#FF9500',      // Warm orange
-            light: '#FFB84D',
-            dark: '#CC7700',
-            contrastText: '#fff',
+            main: '#1b1b1b',
+            light: '#E7E9EB',
+            // dark: '#494A4B',
+            // contrastText: '#fff',
         },
+        // primary: {
+        //     main: '#0F3A7D',      // Deep tech blue
+        //     light: '#4A6FA5',
+        //     dark: '#051F3E',
+        //     contrastText: '#fff',
+        // },
+        // secondary: {
+        //     main: '#FF9500',      // Warm orange
+        //     light: '#FFB84D',
+        //     dark: '#CC7700',
+        //     contrastText: '#fff',
+        // },
         success: {
             main: '#4CAF50',
         },
@@ -34,13 +46,25 @@ const theme = createTheme({
             paper: '#FFFFFF',
         },
     },
+    typography: {
+        fontFamily: [
+            'Roboto Mono',
+            'monospace',
+        ].join(','),
+    },
     components: {
         MuiLink: {
             // styleOverrides
             defaultProps: {
                 color: 'inherit'
             }
+        },
+        MuiIconButton: {
+            defaultProps: {
+                color: 'secondary'
+            }
         }
+
     }
 })
 
@@ -49,11 +73,11 @@ createRoot(document.getElementById('root')).render(
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <BrowserRouter>
-                    <Routes>
-                        <Route path='/' element={<Layout />} >
-                            <Route index element={<HomePage />} />
-                        </Route>
-                    </Routes>
+                <Routes>
+                    <Route path='/' element={<Layout />} >
+                        <Route index element={<HomePage />} />
+                    </Route>
+                </Routes>
             </BrowserRouter>
         </ThemeProvider>
     </StrictMode>

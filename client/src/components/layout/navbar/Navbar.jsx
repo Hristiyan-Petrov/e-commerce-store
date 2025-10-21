@@ -1,14 +1,21 @@
-import { AppBar, Box, Button, Chip, Drawer, IconButton, Link, Toolbar, Typography } from "@mui/material";
+import { AppBar, Autocomplete, Avatar, Box, Button, Chip, Container, Drawer, IconButton, Link, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, TextField, Toolbar, Typography } from "@mui/material";
+import Divider from '@mui/material/Divider';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'; import { Link as RouterLink } from "react-router";
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import { Link as RouterLink } from "react-router";
 import AccountMenuItem from "./AccountMenuItem";
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { HIDE_MOBILE, SHOW_MD_UP, SHOW_MOBILE_ONLY, SHOW_UP_MD } from "../../../constants/breakpoints";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchAll } from '../../../api/product';
 
 const navigationLinks = [
     { label: 'Shop', to: '/shop' },
@@ -22,23 +29,56 @@ const accountMenuItems = [
     { label: 'Logout', to: '#' },
 ];
 
+const searchRelatedLinks = [
+    { label: 'Mice', to: '/shop/mice' },
+    { label: 'Keyborads', to: '/shop/keyboards' },
+    { label: 'Monitors', to: '/shop/monitors' },
+    { label: 'New Arivals', to: '/shop/new-arrivals' },
+];
+
 const Navbar = () => {
+    const [products, setProducts] = useState([]);
+
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const toggleMobileMenu = () => {
         setMobileMenuOpen(prevState => !prevState);
         setAccountMenuOpen(false);
-    }
+        setSearchMenuOpen(false);
+    };
 
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
     const toggleAcountMenu = () => {
         setAccountMenuOpen(prevState => !prevState);
         setMobileMenuOpen(false);
-    }
+        setSearchMenuOpen(false);
+    };
 
+    const [searchMenuOpen, setSearchMenuOpen] = useState(false);
+    const toggleSearchMenu = () => {
+        setSearchMenuOpen(prevState => !prevState);
+        setMobileMenuOpen(false);
+        setAccountMenuOpen(false);
+    };
 
     const handleSearch = () => {
         console.log('You clicked search.');
     };
+
+    useEffect(() => {
+        const getProducts = async () => {
+            fetchAll()
+                .then(products => {
+                    setProducts(products);
+                    console.log(products);
+
+                })
+                .catch(err => {
+                    console.log('ERROR' + err);
+                })
+        };
+
+        getProducts();
+    }, []);
 
 
     return (
@@ -109,25 +149,18 @@ const Navbar = () => {
                                 color: 'secondary.main'
                             }
                         }}
-                        onClick={handleSearch}
+                        onClick={toggleSearchMenu}
                         icon={<SearchOutlinedIcon />}
                     />
-                    <IconButton
-                        sx={{
-                            display: { sm: 'none' },
-                            color: 'secondary.main'
-                        }}
-                        aria-label="search product"
 
-                    >
-                        <SearchOutlinedIcon />
-                    </IconButton>
+                    <SearchMenuIcon open={searchMenuOpen} toggleMenu={toggleSearchMenu} />
 
                     <AccountMenuIcon open={accountMenuOpen} toggleMenu={toggleAcountMenu} />
 
                     <IconButton aria-label="mini shopping cart">
                         <ShoppingCartOutlinedIcon />
                     </IconButton>
+
                     <MobileMenuIcon open={mobileMenuOpen} toggleMenu={toggleMobileMenu} />
 
 
@@ -141,7 +174,7 @@ const Navbar = () => {
                         right: 0,
                         height: 'calc(100vh - 56px)', // 56px is the default Toolbar height on mobile - only place where the mobile menu is visible
                         overflow: 'hidden',
-                        pointerEvents: mobileMenuOpen || accountMenuOpen ? 'auto' : 'none',
+                        pointerEvents: mobileMenuOpen || accountMenuOpen || searchMenuOpen ? 'auto' : 'none',
                     }}
                 >
                     {/* Menus */}
@@ -152,6 +185,11 @@ const Navbar = () => {
                     <AccountMenu
                         open={accountMenuOpen}
                         toggleMenu={toggleAcountMenu}
+                    />
+                    <SearchMenu
+                        open={searchMenuOpen}
+                        toggleMenu={toggleSearchMenu}
+                        products={products}
                     />
                 </Box>
             </Toolbar>
@@ -309,8 +347,8 @@ const AccountMenu = ({ open, toggleMenu }) => {
             }}
             sx={{
                 position: "absolute",
-                width: { xs: '100%', sm: '50%', md: '30%', lg: '25%'},
-                right: {sm: 0, xl: '15%'}
+                width: { xs: '100%', sm: '50%', md: '30%', lg: '25%' },
+                right: { sm: 0, xl: '15%' }
             }}
             PaperProps={{
                 sx: {
@@ -343,7 +381,7 @@ const AccountMenu = ({ open, toggleMenu }) => {
                                 borderBottomColor: 'secondary.light'
                             }}
                         >
-                            {link.label}
+                            {link.label} {link.label === 'logout' && <LogoutOutlinedIcon />}
                         </Link>
                     ))
                 }
@@ -372,6 +410,181 @@ const AccountMenu = ({ open, toggleMenu }) => {
                     </Button>
                 </Box>
             </Box>}
+        </Drawer>
+    );
+};
+
+const SearchMenuIcon = ({ open, toggleMenu }) => {
+    return (
+        <IconButton
+            sx={{
+                display: { sm: 'none' },
+                color: 'secondary.main'
+            }}
+            aria-label="search product"
+            onClick={toggleMenu}
+        >
+            {open
+                ? <SearchOffIcon />
+                : <SearchOutlinedIcon />
+            }
+        </IconButton>
+    );
+};
+
+const SearchMenu = ({ open, toggleMenu, products }) => {
+    return (
+        <Drawer
+            open={open}
+            anchor="top"
+            variant="persistent"
+            ModalProps={{
+                disablePortal: true,
+                keepMounted: false // Don't keep in the DOM when closed
+            }}
+            sx={{
+                position: "absolute",
+                width: '100%'
+            }}
+            PaperProps={{
+                sx: {
+                    position: 'relative',
+                }
+            }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderTopColor: 'primary.main',
+                    borderTopWidth: '5px',
+                    borderTopStyle: 'solid',
+                    height: 'fit-content',
+                    minWidth: { md: '75%', lg: '50%' },
+                    m: { md: '0 auto' }
+                }}>
+                <Container
+                    component='section'
+                    sx={{
+                        textAlign: "center",
+                        pt: 2,
+                        pb: 2
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-around'
+                        }}
+                    >
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                pb: 2
+                            }}
+                        >
+                            Suggested searches
+                        </Typography>
+                        <CancelOutlinedIcon
+                            onClick={toggleMenu}
+                        />
+                    </Box>
+
+                    <List>
+                        {searchRelatedLinks.map(link => (
+                            <ListItemButton
+                                key={link.label}
+                                component={RouterLink}
+                                to={link.to}
+
+                                sx={{
+                                    maxWidth: '90%',
+                                    transition: 'background-color 0.7s',
+                                    borderRadius: 5,
+                                    '&:hover': {
+                                        cursor: 'pointer',
+                                        backgroundColor: 'primary.light',
+                                        transition: 'background-color 0.2s',
+                                        '& .MuiSvgIcon-root': {
+                                            opacity: 1,
+                                            transition: 'opacity 0.2s'
+                                        }
+                                    }
+                                }}
+                            >
+                                <KeyboardArrowRightRoundedIcon sx={{
+                                    mr: 5,
+                                    opacity: 0,
+                                    transition: 'opacity 0.2s'
+                                }}
+                                />
+                                <ListItemText>
+                                    {link.label}
+                                </ListItemText>
+                            </ListItemButton>
+                        ))}
+
+                    </List>
+                </Container>
+                <Divider />
+                <Container
+                    component='section'
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        p: 3
+                    }}>
+
+                    <Autocomplete
+                        component='input'
+                        id="searcg-field"
+                        freeSolo
+                        options={products.map(p => p.name)}
+                        renderInput={params => (
+                            <TextField
+                                {...params} label="What are you looking for?"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '50px', // Set the desired radius here
+                                        // color: 'primary.light',
+                                        '&.Mui-focused fieldset': {
+                                            // color: 'primary.light',
+                                            borderColor: 'secondary.main', // Example: keep border color consistent
+                                        },
+                                    },
+                                }}
+                            />
+                        )}
+                        sx={{
+                            width: '100%',
+                        }}
+                    />
+                </Container>
+
+
+                {/* {
+                    navigationLinks.map(link => (
+                        <Link
+                            key={link.label}
+                            to={link.to}
+                            component={RouterLink}
+                            onClick={toggleMenu}
+                            sx={{
+                                textDecoration: 'none',
+                                fontWeight: '500',
+                                p: 2,
+                                borderBottomWidth: '2px',
+                                borderBottomStyle: 'solid',
+                                borderBottomColor: 'secondary.light'
+                            }}
+                        >
+                            {link.label}
+                        </Link>
+                    ))
+                } */}
+            </Box>
         </Drawer>
     );
 };

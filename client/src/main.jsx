@@ -63,6 +63,15 @@ const theme = createTheme({
             defaultProps: {
                 color: 'secondary'
             }
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 24,
+                    fontWeight: 800,
+                    letterSpacing: 1.5
+                }
+            }
         }
 
     }

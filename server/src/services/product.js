@@ -1,12 +1,12 @@
 const { AppDataSource } = require("../data-source");
 const { Product } = require("../entity/Product");
+const productRepo = AppDataSource.getRepository(Product);
 
 const generalError = 'Error from product service:';
 
-const findLatestProducts = async (limit) => {    
+const findLatest = async (limit) => {
     try {
-        const productRepo = AppDataSource.getRepository(Product);
-        const products =  await productRepo.find({
+        const products = await productRepo.find({
             order: { createdAt: "DESC" },
             take: limit
         });
@@ -17,6 +17,16 @@ const findLatestProducts = async (limit) => {
     }
 };
 
+const findAll = async () => {
+    return productRepo.find()
+        .then(res => res)
+        .catch(err => {
+            console.log(generalError, err);
+            throw new Error('An error occurred while fetching products.')
+        });
+};
+
 module.exports = {
-    findLatestProducts
+    findLatest,
+    findAll
 };

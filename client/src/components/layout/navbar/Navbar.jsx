@@ -163,10 +163,27 @@ const Navbar = () => {
                             pl: 10,
                             '& .MuiChip-icon': {
                                 color: 'secondary.main'
+                            },
+                            position: 'relative',
+                            '&::after': {
+                                content: '""',
+                                position: 'absolute',
+                                top: '2.25rem',
+                                left: 0,
+                                right: 0,
+                                height: '5px',
+                                backgroundColor: 'primary.main',
+                                transform: 'scaleX(0)',
+                                transformOrigin: 'right',
+                                transition: 'transform 0.2s',
+                            },
+                            '&:hover::after': {
+                                transform: 'scaleX(1)',
+                                transformOrigin: 'left',
                             }
                         }}
                         onClick={toggleSearchMenu}
-                        icon={<SearchOutlinedIcon />}
+                        icon={searchMenuOpen ? <SearchOffIcon /> : <SearchOutlinedIcon />}
                     />
 
                     <SearchMenuIcon open={searchMenuOpen} toggleMenu={toggleSearchMenu} />
@@ -219,9 +236,27 @@ const Navbar = () => {
 const MobileMenuIcon = ({ open, toggleMenu }) => {
     return (
         <IconButton
+            disableRipple
             aria-label="mobile menu"
             sx={{
-                display: SHOW_MOBILE_ONLY
+                display: SHOW_MOBILE_ONLY,
+                position: 'relative',
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '2.5rem',
+                    left: 0,
+                    right: 0,
+                    height: '5px',
+                    backgroundColor: 'primary.main',
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'right',
+                    transition: 'transform 0.2s',
+                },
+                '&:hover::after': {
+                    transform: 'scaleX(1)',
+                    transformOrigin: 'left',
+                }
             }}
             onClick={toggleMenu}
         >
@@ -305,8 +340,28 @@ const MobileMenu = ({ open, toggleMenu }) => {
 const AccountMenuIcon = ({ open, toggleMenu }) => {
     return (
         <IconButton
+            disableRipple
             aria-label="account icon"
             onClick={toggleMenu}
+            sx={{
+                position: 'relative',
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '2.5rem',
+                    left: 0,
+                    right: 0,
+                    height: '5px',
+                    backgroundColor: 'primary.main',
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'right',
+                    transition: 'transform 0.2s',
+                },
+                '&:hover::after': {
+                    transform: 'scaleX(1)',
+                    transformOrigin: 'left',
+                }
+            }}
         >
 
             {/* <PersonIcon
@@ -435,9 +490,27 @@ const AccountMenu = ({ open, toggleMenu }) => {
 const SearchMenuIcon = ({ open, toggleMenu }) => {
     return (
         <IconButton
+            disableRipple
             sx={{
-                display: { sm: 'none' },
-                color: 'secondary.main'
+                display: SHOW_MOBILE_ONLY,
+                color: 'secondary.main',
+                position: 'relative',
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '2.5rem',
+                    left: 0,
+                    right: 0,
+                    height: '5px',
+                    backgroundColor: 'primary.main',
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'right',
+                    transition: 'transform 0.2s',
+                },
+                '&:hover::after': {
+                    transform: 'scaleX(1)',
+                    transformOrigin: 'left',
+                }
             }}
             aria-label="search product"
             onClick={toggleMenu}
@@ -607,8 +680,26 @@ const MiniCartIcon = ({ open, toggle }) => {
 
     return (
         <IconButton
+            disableRipple
             sx={{
                 color: 'secondary.main',
+                position: 'relative',
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '2.5rem',
+                    left: 0,
+                    right: 0,
+                    height: '5px',
+                    backgroundColor: 'primary.main',
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'right',
+                    transition: 'transform 0.2s',
+                },
+                '&:hover::after': {
+                    transform: 'scaleX(1)',
+                    transformOrigin: 'left',
+                }
             }}
             aria-label="mini shopping cart"
             onClick={toggle}
@@ -821,24 +912,16 @@ const MiniCartMenu = ({ open, toggle }) => {
                                                         </ListItemAvatar>
 
                                                         <ListItemText
+                                                            primaryTypographyProps={{ component: 'div' }}
+                                                            secondaryTypographyProps={{ component: 'div' }}
                                                             primary={
                                                                 <Stack direction="row" alignItems="center" spacing={1}>
                                                                     <Typography fontWeight='bold'>{product.name}</Typography>
-                                                                    {/* 3. Add Sale Badge */}
                                                                     {isOnSale && <LocalOffer color="primary" />}
-                                                                    {/* {isOnSale && (
-                                                                        <Chip
-                                                                            label="SALE"
-                                                                            size="small"
-                                                                            color="error"
-                                                                            sx={{ height: 'auto', '& .MuiChip-label': { py: 0.25, px: 0.5, fontSize: '0.65rem', fontWeight: 'bold' } }}
-                                                                        />
-                                                                    )} */}
                                                                 </Stack>
                                                             }
                                                             secondary={
                                                                 <Stack direction="row" spacing={1} alignItems="center">
-                                                                    {/* Display original price with line-through if on sale */}
                                                                     {isOnSale && (
                                                                         <Typography
                                                                             variant="body2"
@@ -882,7 +965,7 @@ const MiniCartMenu = ({ open, toggle }) => {
                                                             <IconButton size="small">
                                                                 <RemoveOutlinedIcon fontSize="small" />
                                                             </IconButton>
-                                                            <Typography component='subtitle1'>
+                                                            <Typography variant='subtitle1'>
                                                                 {product.quantity}
                                                             </Typography>
                                                             <IconButton size="small">
@@ -892,7 +975,7 @@ const MiniCartMenu = ({ open, toggle }) => {
 
                                                         {/* Item Subtotal Calculation */}
                                                         <Typography
-                                                            component='subtitle1'
+                                                            variant='subtitle1'
                                                             fontWeight='bold'
                                                             color='text.primary'
                                                         >
@@ -939,14 +1022,12 @@ const MiniCartMenu = ({ open, toggle }) => {
 
                                     <Box
                                         sx={{
-                                            mt: 3,
+                                            // mt: 3,
                                             display: 'flex',
                                             justifyContent: "space-between"
                                         }}>
 
-                                        <Typography
-
-                                        >
+                                        <Typography>
                                             Total Savings:
                                         </Typography>
                                         <Typography

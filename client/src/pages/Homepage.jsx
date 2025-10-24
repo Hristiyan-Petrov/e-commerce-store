@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
-import HeroSection from '../components/home/HeroSection';
+// import HeroSection from '../components/home/HeroSection';
 // import NewArrivals from '../components/home/NewArrivals';
-import { fetchLatestProducts } from '../api/product';
+import { fetchLatest } from '../api/product';
 import FreeOfferBanner from '../components/home/FreeOfferBanner';
+import HeroSection from '../components/home/HeroSection';
 
 const HomePage = () => {
   // const [latestProducts, setLatestProducts] = useState([]);
@@ -15,7 +16,7 @@ const HomePage = () => {
   //     try {
   //       setIsLoading(true);
   //       setError(null);
-  //       const data = await fetchLatestProducts(5);
+  //       const data = await fetchLatest(5);
   //       setLatestProducts(data);
   //     } catch (err) {
   //       setError('Failed to fetch new products. Please try again later.');

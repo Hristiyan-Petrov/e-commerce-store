@@ -4,9 +4,6 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link as RouterLink } from "react-router";
-import AccountMenuItem from "./AccountMenuItem";
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import PersonIcon from '@mui/icons-material/Person';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -18,20 +15,19 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import LocalOffer from '@mui/icons-material/LocalOffer';
-import { HIDE_MOBILE, SHOW_MD_UP, SHOW_MOBILE_ONLY, SHOW_UP_MD } from "../../../constants/breakpoints";
+import { HIDE_MOBILE, SHOW_MD_DOWN, SHOW_MD_UP, SHOW_MOBILE_ONLY } from "../../constants/breakpoints";
 import { useEffect, useState } from "react";
-import { fetchAll } from '../../../api/product';
+import { fetchAll } from '../../api/product';
+import TopDrawerMenu from "./TopDrawerMenu";
+import NavIcon from "../../components/common/NavIcon";
+import { underlineHoverEffect } from '../../styles/common'
+
+import Account from "../../features/account/Account.jsx";
 
 const navigationLinks = [
     { label: 'Shop', to: '/shop' },
     { label: 'Software', to: '/software' },
     { label: 'Deals', to: '/shop/deals' },
-];
-
-const accountMenuItems = [
-    { label: 'Profile', to: '/profile' },
-    { label: 'Settings', to: '/settings' },
-    { label: 'Logout', to: '#' },
 ];
 
 const searchRelatedLinks = [
@@ -44,37 +40,11 @@ const searchRelatedLinks = [
 const Navbar = () => {
     const [products, setProducts] = useState([]);
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const toggleMobileMenu = () => {
-        setMobileMenuOpen(prevState => !prevState);
-        setAccountMenuOpen(false);
-        setSearchMenuOpen(false);
-        setMiniCartOpen(false);
-    };
-
-    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-    const toggleAcountMenu = () => {
-        setAccountMenuOpen(prevState => !prevState);
-        setMobileMenuOpen(false);
-        setSearchMenuOpen(false);
-        setMiniCartOpen(false);
-    };
-
-    const [searchMenuOpen, setSearchMenuOpen] = useState(false);
-    const toggleSearchMenu = () => {
-        setSearchMenuOpen(prevState => !prevState);
-        setMobileMenuOpen(false);
-        setAccountMenuOpen(false);
-        setMiniCartOpen(false);
-    };
-
-    const [miniCartOpen, setMiniCartOpen] = useState(false);
-    const toggleMiniCart = () => {
-        setMiniCartOpen(prevState => !prevState);
-        setMobileMenuOpen(false);
-        setAccountMenuOpen(false);
-        setSearchMenuOpen(false);
-    };
+    const [activeMenu, setActiveMenu] = useState(null);
+    const handleMenuToggle = (menuName) => {
+        console.log(menuName);
+        setActiveMenu(prevMenu => prevMenu === menuName ? null : menuName);
+    }
 
     const handleSearch = () => {
         console.log('You clicked search.');
@@ -128,22 +98,7 @@ const Navbar = () => {
                                     textDecoration: 'none',
                                     fontWeight: '500',
                                     position: 'relative',
-                                    '&::after': {
-                                        content: '""',
-                                        position: 'absolute',
-                                        top: '2rem',
-                                        left: 0,
-                                        right: 0,
-                                        height: '5px',
-                                        backgroundColor: 'primary.main',
-                                        transform: 'scaleX(0)',
-                                        transformOrigin: 'right',
-                                        transition: 'transform 0.2s',
-                                    },
-                                    '&:hover::after': {
-                                        transform: 'scaleX(1)',
-                                        transformOrigin: 'left',
-                                    }
+                                    ...underlineHoverEffect()
                                 }}
                             >
                                 {link.label}
@@ -152,6 +107,7 @@ const Navbar = () => {
                     </Box>
                 </Box>
 
+                {/* Nav Icons */}
                 <Box sx={{
                     display: "flex",
                     gap: 1,
@@ -159,7 +115,7 @@ const Navbar = () => {
                 }}>
                     <Chip
                         sx={{
-                            display: HIDE_MOBILE,
+                            display: SHOW_MD_UP,
                             pl: 10,
                             '& .MuiChip-icon': {
                                 color: 'secondary.main'
@@ -182,20 +138,26 @@ const Navbar = () => {
                                 transformOrigin: 'left',
                             }
                         }}
-                        onClick={toggleSearchMenu}
-                        icon={searchMenuOpen ? <SearchOffIcon /> : <SearchOutlinedIcon />}
+                        onClick={() => handleMenuToggle('search')}
+                        icon={activeMenu === 'search' ? <SearchOffIcon /> : <SearchOutlinedIcon />}
                     />
 
-                    <SearchMenuIcon open={searchMenuOpen} toggleMenu={toggleSearchMenu} />
+                    <SearchMenuIcon open={activeMenu === 'search'} toggle={() => handleMenuToggle('search')} />
 
-                    <AccountMenuIcon open={accountMenuOpen} toggleMenu={toggleAcountMenu} />
+                    <Account
+                        open={activeMenu === 'account'}
+                        toggle={() => handleMenuToggle('account')}
+                    />
+                    {/* // <AccountMenuIcon open={activeMenu === 'account'} toggle={() => handleMenuToggle('account')} /> */}
 
-                    <MiniCartIcon open={miniCartOpen} toggle={toggleMiniCart} />
+                    <MiniCartIcon open={activeMenu === 'miniCart'} toggle={() => handleMenuToggle('miniCart')} />
 
-                    <MobileMenuIcon open={mobileMenuOpen} toggleMenu={toggleMobileMenu} />
+                    <MobileMenuIcon open={activeMenu === 'mobile'} toggle={() => handleMenuToggle('mobile')} />
 
 
                 </Box>
+
+                {/* Menus */}
                 <Box
                     sx={{
                         position: 'absolute',
@@ -205,26 +167,25 @@ const Navbar = () => {
                         right: 0,
                         height: 'calc(100vh - 56px)', // 56px is the default Toolbar height on mobile - only place where the mobile menu is visible
                         overflow: 'hidden',
-                        pointerEvents: mobileMenuOpen || accountMenuOpen || searchMenuOpen || miniCartOpen ? 'auto' : 'none',
+                        pointerEvents: activeMenu ? 'auto' : 'none',
                     }}
                 >
-                    {/* Menus */}
                     <MobileMenu
-                        open={mobileMenuOpen}
-                        toggleMenu={toggleMobileMenu}
+                        open={activeMenu === 'mobile'}
+                        toggleMenu={() => handleMenuToggle('mobile')}
                     />
-                    <AccountMenu
-                        open={accountMenuOpen}
-                        toggleMenu={toggleAcountMenu}
-                    />
+                    {/* <AccountMenu
+                        open={activeMenu === 'account'}
+                        toggleMenu={() => handleMenuToggle('account')}
+                    /> */}
                     <SearchMenu
-                        open={searchMenuOpen}
-                        toggleMenu={toggleSearchMenu}
+                        open={activeMenu === 'search'}
+                        toggleMenu={() => handleMenuToggle('search')}
                         products={products}
                     />
                     <MiniCartMenu
-                        open={miniCartOpen}
-                        toggle={toggleMiniCart}
+                        open={activeMenu === 'miniCart'}
+                        toggle={() => handleMenuToggle('miniCart')}
                     />
                 </Box>
             </Toolbar>
@@ -233,32 +194,14 @@ const Navbar = () => {
     );
 };
 
-const MobileMenuIcon = ({ open, toggleMenu }) => {
+const MobileMenuIcon = ({ open, toggle }) => {
     return (
-        <IconButton
-            disableRipple
-            aria-label="mobile menu"
+        <NavIcon
+            open={open}
+            toggle={toggle}
             sx={{
-                display: SHOW_MOBILE_ONLY,
-                position: 'relative',
-                '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: '2.5rem',
-                    left: 0,
-                    right: 0,
-                    height: '5px',
-                    backgroundColor: 'primary.main',
-                    transform: 'scaleX(0)',
-                    transformOrigin: 'right',
-                    transition: 'transform 0.2s',
-                },
-                '&:hover::after': {
-                    transform: 'scaleX(1)',
-                    transformOrigin: 'left',
-                }
+                display: SHOW_MOBILE_ONLY
             }}
-            onClick={toggleMenu}
         >
 
             <Box sx={{
@@ -279,38 +222,19 @@ const MobileMenuIcon = ({ open, toggleMenu }) => {
                     opacity: open ? 1 : 0,
                 }} />
             </Box>
-
-        </IconButton>
+        </NavIcon>
     );
 };
 
 const MobileMenu = ({ open, toggleMenu }) => {
     return (
-        <Drawer
+        <TopDrawerMenu
             open={open}
-            anchor="top"
-            variant="persistent"
-            ModalProps={{
-                disablePortal: true,
-                keepMounted: false // Don't keep in the DOM when closed
-            }}
-            sx={{
-                position: "absolute",
-                width: '100%'
-            }}
-            PaperProps={{
-                sx: {
-                    position: 'relative',
-                }
-            }}
         >
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    borderTopColor: 'primary.main',
-                    borderTopWidth: '5px',
-                    borderTopStyle: 'solid',
                 }}>
                 {
                     navigationLinks.map(link => (
@@ -333,224 +257,114 @@ const MobileMenu = ({ open, toggleMenu }) => {
                     ))
                 }
             </Box>
-        </Drawer>
+        </TopDrawerMenu>
     );
 };
 
-const AccountMenuIcon = ({ open, toggleMenu }) => {
+// const AccountMenuIcon = ({ open, toggle }) => {
+//     return (
+//         <NavIcon
+//             open={open}
+//             toggle={toggle}
+//         >
+//             {open
+//                 ? <PersonIcon />
+//                 : <PersonOutlinedIcon />
+//             }
+//         </NavIcon>
+//     );
+// };
+
+// const AccountMenu = ({ open, toggleMenu }) => {
+//     const isAuth = false;
+
+//     return (
+//         <TopDrawerMenu
+//             open={open}
+//             sx={{
+//                 width: { xs: '100%', sm: '50%', md: '30%', lg: '25%' },
+//                 right: { sm: 0, xl: '15%' }
+//             }}
+//         >
+
+//             {isAuth && <Box
+//                 sx={{
+//                     display: 'flex',
+//                     flexDirection: 'column',
+//                 }}>
+//                 {
+//                     accountMenuItems.map(link => (
+//                         <Link
+//                             key={link.label}
+//                             to={link.to}
+//                             component={RouterLink}
+//                             onClick={toggleMenu}
+//                             sx={{
+//                                 textDecoration: 'none',
+//                                 fontWeight: '500',
+//                                 p: 2,
+//                                 borderBottomWidth: '2px',
+//                                 borderBottomStyle: 'solid',
+//                                 borderBottomColor: 'secondary.light'
+//                             }}
+//                         >
+//                             {link.label} {link.label === 'logout' && <LogoutOutlinedIcon />}
+//                         </Link>
+//                     ))
+//                 }
+//             </Box>}
+
+
+//             {!isAuth && <Box sx={{
+//                 p: 3,
+//                 textAlign: 'center',
+//             }}>
+//                 <Typography variant="h6" gutterBottom>
+//                     Your Account Awaits
+//                 </Typography>
+//                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+//                     Get access to your account and unlock exclusive offers.
+//                 </Typography>
+//                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+//                     <Button component={RouterLink} to="/register" variant="contained">
+//                         Login
+//                     </Button>
+//                     <Button component={RouterLink} to="/login" variant="contained" color="secondary">
+//                         Create Account
+//                     </Button>
+//                 </Box>
+//             </Box>}
+//         </TopDrawerMenu>
+
+//     );
+// };
+
+const SearchMenuIcon = ({ open, toggle }) => {
     return (
-        <IconButton
-            disableRipple
-            aria-label="account icon"
-            onClick={toggleMenu}
-            sx={{
-                position: 'relative',
-                '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: '2.5rem',
-                    left: 0,
-                    right: 0,
-                    height: '5px',
-                    backgroundColor: 'primary.main',
-                    transform: 'scaleX(0)',
-                    transformOrigin: 'right',
-                    transition: 'transform 0.2s',
-                },
-                '&:hover::after': {
-                    transform: 'scaleX(1)',
-                    transformOrigin: 'left',
-                }
-            }}
-        >
-
-            {/* <PersonIcon
-                sx={{
-                    transition: 'fill 0.3s ease-in-out',
-                    // If open, fill with current color. If not, make the fill transparent.
-                    fill: open ? 'currentColor' : 'transparent',
-                    // Always have a stroke color
-                    stroke: 'currentColor',
-                    // When not open, set a stroke width to create the outline.
-                    // Adjust the value (e.g., 1, 1.5) to get your desired thickness.
-                    // When open, the fill will cover the stroke, so we can set it to 0.
-                    strokeWidth: open ? 0 : 1,
-                }}
-            /> */}
-
-            {open
-                ? <PersonIcon />
-                : <PersonOutlinedIcon />
-            }
-
-            {/* <Box sx={{
-                position: 'relative',
-                // Set a fixed size to prevent layout shift
-                width: 24,
-                height: 24,
-            }}>
-                <PersonOutlinedIcon sx={{
-                    position: 'absolute',
-                    transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
-                    opacity: open ? 0 : 1,
-                    transform: open ? 'scale(0.8)' : 'scale(1)',
-                }} />
-                <PersonIcon sx={{
-                    transition: 'transform 0.3s, opacity 0.2s',
-                    transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
-                    opacity: open ? 1 : 0,
-                    transform: open ? 'scale(1)' : 'scale(0.8)',
-                }} />
-            </Box> */}
-
-        </IconButton>
-    );
-};
-
-const AccountMenu = ({ open, toggleMenu }) => {
-    const isAuth = false;
-    return (
-        <Drawer
+        <NavIcon
             open={open}
-            anchor="top"
-            variant="persistent"
-            ModalProps={{
-                disablePortal: true,
-                keepMounted: false // Don't keep in the DOM when closed
-            }}
+            toggle={toggle}
             sx={{
-                position: "absolute",
-                width: { xs: '100%', sm: '50%', md: '30%', lg: '25%' },
-                right: { sm: 0, xl: '15%' }
+                display: SHOW_MD_DOWN,
             }}
-            PaperProps={{
-                sx: {
-                    position: 'relative',
-                }
-            }}
-        >
-
-            {isAuth && <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderTopColor: 'primary.main',
-                    borderTopWidth: '5px',
-                    borderTopStyle: 'solid',
-                }}>
-                {
-                    accountMenuItems.map(link => (
-                        <Link
-                            key={link.label}
-                            to={link.to}
-                            component={RouterLink}
-                            onClick={toggleMenu}
-                            sx={{
-                                textDecoration: 'none',
-                                fontWeight: '500',
-                                p: 2,
-                                borderBottomWidth: '2px',
-                                borderBottomStyle: 'solid',
-                                borderBottomColor: 'secondary.light'
-                            }}
-                        >
-                            {link.label} {link.label === 'logout' && <LogoutOutlinedIcon />}
-                        </Link>
-                    ))
-                }
-            </Box>}
-
-
-            {!isAuth && <Box sx={{
-                p: 3,
-                textAlign: 'center',
-                borderTopColor: 'primary.main',
-                borderTopWidth: '5px',
-                borderTopStyle: 'solid',
-            }}>
-                <Typography variant="h6" gutterBottom>
-                    Your Account Awaits
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Get access to your account and unlock exclusive offers.
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Button component={RouterLink} to="/register" variant="contained">
-                        Login
-                    </Button>
-                    <Button component={RouterLink} to="/login" variant="contained" color="secondary">
-                        Create Account
-                    </Button>
-                </Box>
-            </Box>}
-        </Drawer>
-    );
-};
-
-const SearchMenuIcon = ({ open, toggleMenu }) => {
-    return (
-        <IconButton
-            disableRipple
-            sx={{
-                display: SHOW_MOBILE_ONLY,
-                color: 'secondary.main',
-                position: 'relative',
-                '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: '2.5rem',
-                    left: 0,
-                    right: 0,
-                    height: '5px',
-                    backgroundColor: 'primary.main',
-                    transform: 'scaleX(0)',
-                    transformOrigin: 'right',
-                    transition: 'transform 0.2s',
-                },
-                '&:hover::after': {
-                    transform: 'scaleX(1)',
-                    transformOrigin: 'left',
-                }
-            }}
-            aria-label="search product"
-            onClick={toggleMenu}
         >
             {open
                 ? <SearchOffIcon />
                 : <SearchOutlinedIcon />
             }
-        </IconButton>
+        </NavIcon>
     );
 };
 
 const SearchMenu = ({ open, toggleMenu, products }) => {
     return (
-        <Drawer
+        <TopDrawerMenu
             open={open}
-            anchor="top"
-            variant="persistent"
-            ModalProps={{
-                disablePortal: true,
-                keepMounted: false // Don't keep in the DOM when closed
-            }}
-            sx={{
-                position: "absolute",
-                width: '100%',
-
-            }}
-            PaperProps={{
-                sx: {
-                    position: 'relative',
-                }
-            }}
         >
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    borderTopColor: 'primary.main',
-                    borderTopWidth: '5px',
-                    borderTopStyle: 'solid',
                     height: 'fit-content',
                     height: '100vh'
                 }}>
@@ -598,16 +412,11 @@ const SearchMenu = ({ open, toggleMenu, products }) => {
                                         cursor: 'pointer',
                                         backgroundColor: 'primary.light',
                                         transition: 'background-color 0.2s',
-                                        // '& .MuiSvgIcon-root': {
-                                        //     opacity: 1,
-                                        //     transition: 'opacity 0.2s'
-                                        // }
                                     }
                                 }}
                             >
                                 <KeyboardArrowRightRoundedIcon sx={{
                                     mr: 5,
-                                    // opacity: { sm: 1, lg: 0 },
                                     transition: 'opacity 0.2s'
                                 }}
                                 />
@@ -656,7 +465,8 @@ const SearchMenu = ({ open, toggleMenu, products }) => {
                     />
                 </Container>
             </Box>
-        </Drawer>
+        </TopDrawerMenu>
+
     );
 };
 
@@ -679,30 +489,9 @@ const MiniCartIcon = ({ open, toggle }) => {
     ];
 
     return (
-        <IconButton
-            disableRipple
-            sx={{
-                color: 'secondary.main',
-                position: 'relative',
-                '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: '2.5rem',
-                    left: 0,
-                    right: 0,
-                    height: '5px',
-                    backgroundColor: 'primary.main',
-                    transform: 'scaleX(0)',
-                    transformOrigin: 'right',
-                    transition: 'transform 0.2s',
-                },
-                '&:hover::after': {
-                    transform: 'scaleX(1)',
-                    transformOrigin: 'left',
-                }
-            }}
-            aria-label="mini shopping cart"
-            onClick={toggle}
+        <NavIcon
+            open={open}
+            toggle={toggle}
         >
             <Badge
                 badgeContent={miniCartItems.length}
@@ -718,7 +507,7 @@ const MiniCartIcon = ({ open, toggle }) => {
                     : <ShoppingCartOutlinedIcon />
                 }
             </Badge>
-        </IconButton>
+        </NavIcon>
     );
 };
 
@@ -782,31 +571,14 @@ const MiniCartMenu = ({ open, toggle }) => {
     );
 
     return (
-        <Drawer
+        <TopDrawerMenu
             open={open}
-            anchor="top"
-            variant="persistent"
-            ModalProps={{
-                disablePortal: true,
-                keepMounted: false // Don't keep in the DOM when closed
-            }}
-            sx={{
-                position: "absolute",
-                width: '100%'
-            }}
-            PaperProps={{
-                sx: {
-                    position: 'relative',
-                }
-            }}
         >
             <Stack
                 py={3}
                 component='section'
                 sx={{
-                    borderTopColor: 'primary.main',
-                    borderTopWidth: '5px',
-                    borderTopStyle: 'solid',
+
                     backgroundColor: 'secondary.light',
                     maxHeight: 'calc(100vh - 56px)',
                     overflowY: 'auto',
@@ -861,7 +633,6 @@ const MiniCartMenu = ({ open, toggle }) => {
                                 <Typography
                                     variant="h6"
                                     sx={{
-                                        letterSpacing: 1.5,
                                         textAlign: 'center'
                                     }}
                                 >
@@ -898,7 +669,9 @@ const MiniCartMenu = ({ open, toggle }) => {
                                                         sx={{
                                                             maxWidth: 'fit-content',
                                                             borderRadius: 5,
+                                                            transition: 'background-color 0.5s',
                                                             '&:hover': {
+                                                                transition: 'background-color 0.2s',
                                                                 backgroundColor: 'primary.light'
                                                             }
                                                         }}
@@ -1040,19 +813,26 @@ const MiniCartMenu = ({ open, toggle }) => {
                                                 }, 0).toFixed(2)}
                                         </Typography>
                                     </Box>
+                                    <Divider
+                                        sx={{
+                                            mt: 3
+                                        }}
+                                    />
                                     <Box
                                         sx={{
                                             mt: 3,
                                             display: 'flex',
-                                            justifyContent: "space-between"
+                                            justifyContent: "space-between",
                                         }}>
 
                                         <Typography
+                                            fontWeight="bold"
 
                                         >
                                             Total:
                                         </Typography>
                                         <Typography
+                                            fontWeight="bold"
 
                                         >
                                             ${miniCartItems.reduce((acc, curr) => {
@@ -1085,8 +865,210 @@ const MiniCartMenu = ({ open, toggle }) => {
                     )}
 
             </Stack>
-        </Drawer >
+        </TopDrawerMenu>
+
     );
 };
 
 export default Navbar;
+
+
+---
+
+You are absolutely right. Apologies, in refactoring the logic, a few key details that made the original work were missed. This is a very common part of the refactoring process—getting the abstraction right, then fixing the implementation details.
+
+Let's debug this. There are two main problems:
+1.  **The Menu Doesn't Open:** This is because the new `<Account>` feature is being rendered *inside* the `Toolbar`, but the `<TopDrawerMenu>` needs to be rendered *outside* of it to overlay everything correctly.
+2.  **Layout is Broken:** The original code had a clever `Box` wrapper that positioned all the menus correctly. We need to re-introduce that.
+
+Here is the step-by-step fix.
+
+---
+
+### The Core Problem: The Rendering Location
+
+The issue is how the final feature components are rendered.
+
+In your old `Navbar.jsx`, you had this structure:
+```jsx
+<Toolbar>
+    {/* ... All the icons ... */}
+</Toolbar>
+
+{/* THIS BOX IS CRUCIAL */}
+<Box sx={{ position: 'absolute', top: '100%', ... }}>
+    <MobileMenu ... />
+    <SearchMenu ... />
+    <MiniCartMenu ... />
+</Box>
+```
+
+When we moved to the encapsulated feature `<Account />`, it now renders both its icon and its menu from the *same spot* inside the `Toolbar`. The `Drawer` component (inside `TopDrawerMenu`) is now trapped inside the `Toolbar`'s layout context, which prevents it from displaying as a full overlay.
+
+### The Solution: The "Portal" or "Slot" Pattern
+
+The solution is to have the `Navbar` provide two distinct rendering "slots": one for the **icons** and one for the **menus**. Each feature component will be smart enough to render its parts into the correct slot.
+
+This sounds complex, but it's surprisingly simple to implement using React's `children` prop or by passing renderable elements as props.
+
+Let's refactor `Navbar` and `Account` to work this way.
+
+---
+
+### Step 1: Update `Navbar.jsx` to Provide Slots
+
+The `Navbar` will now define a `menus` array and render them in the correct location outside the `Toolbar`.
+
+**`src/layout/navbar/Navbar.jsx` (Corrected Logic)**
+
+```jsx
+import { useState } from 'react';
+import { AppBar, Toolbar, Box, IconButton, /*... other imports*/ } from '@mui/material';
+// ... other imports
+
+// --- Import the feature components ---
+import Account from "../../features/account/Account";
+// ... import Search, MiniCart, MobileMenu when ready
+
+const Navbar = () => {
+    const [activeMenu, setActiveMenu] = useState(null);
+
+    const handleMenuToggle = (menuName) => {
+        setActiveMenu(prevMenu => (prevMenu === menuName ? null : menuName));
+    };
+
+    // This array will hold the menu part of each feature
+    const featureMenus = [];
+
+    return (
+        // Use a wrapper Box to establish a positioning context for the menus
+        <Box sx={{ position: 'relative' }}>
+            <AppBar position="static" sx={{ backgroundColor: 'white' }}>
+                <Toolbar sx={{ justifyContent: { xs: "space-between", xl: 'space-evenly' } }}>
+                    {/* ... Left side of Navbar (unchanged) ... */}
+
+                    {/* Right Side - ICONS SLOT */}
+                    <Box sx={{ display: "flex", gap: 1, alignItems: 'center' }}>
+                        {/*
+                            The Account component will now be "headless".
+                            It will return an object with its icon and menu parts.
+                        */}
+                        <Account
+                            open={activeMenu === 'account'}
+                            toggle={() => handleMenuToggle('account')}
+                            // This function lets the Account feature "register" its menu with the Navbar
+                            addMenu={(menu) => featureMenus.push(menu)}
+                        />
+
+                        {/* Repeat for other features when they are ready */}
+                        {/* <Search open={...} addMenu={...} /> */}
+                        {/* <MiniCart open={...} addMenu={...} /> */}
+                        {/* <MobileMenu open={...} addMenu={...} /> */}
+                    </Box>
+                </Toolbar>
+            </AppBar>
+
+            {/* MENUS SLOT */}
+            {/* This is the crucial part that was missing. It's the same logic as your original code. */}
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    // Use a fixed height or a more dynamic approach if needed
+                    height: 'calc(100vh - 64px)', // Adjust 64px to your toolbar's height
+                    overflow: 'hidden',
+                    // This ensures clicks go "through" this container when no menu is active
+                    pointerEvents: activeMenu ? 'auto' : 'none',
+                }}
+            >
+                {/* Render all the menus that were registered by the features */}
+                {featureMenus}
+            </Box>
+        </Box>
+    );
+};
+
+export default Navbar;
+
+```
+
+### Step 2: Update `Account.jsx` to Return Its Parts
+
+The `Account` feature component will no longer render its menu directly. Instead, it will call the `addMenu` function prop to give its menu JSX back to the `Navbar` to render in the correct "slot".
+
+**`src/features/account/Account.jsx` (Corrected Logic)**
+
+```jsx
+import { useState } from 'react';
+import { Box, Typography, Link, Button } from '@mui/material';
+import { Link as RouterLink } from "react-router-dom";
+// ... other imports
+
+import AccountIcon from './AccountIcon';
+import TopDrawerMenu from '../../components/common/TopDrawerMenu'; // Assuming you moved this
+
+const accountMenuItems = [ /* ... unchanged ... */ ];
+
+// The component now accepts an `addMenu` prop
+export default function Account({ open, toggle, addMenu }) {
+    const [isAuth, setIsAuth] = useState(false);
+
+    const handleLogout = () => { /* ... unchanged ... */ };
+
+    // 1. Define the menu JSX as a variable
+    const accountMenu = (
+        <TopDrawerMenu
+            key="account-menu" // React needs a key when rendering an array of elements
+            open={open}
+            sx={{
+                width: { xs: '100%', sm: '50%', md: '30%', lg: '25%' },
+                right: { sm: 0 },
+                left: { xs: 0, sm: 'auto' },
+            }}
+        >
+            {!isAuth ? (
+                <Box sx={{ p: 3, textAlign: 'center' }}>
+                    {/* ... Unauthenticated View (unchanged) ... */}
+                </Box>
+            ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {/* ... Authenticated View (unchanged, but fix onClick) ... */}
+                    {accountMenuItems.map(link => (
+                        <Link
+                            key={link.label}
+                            to={link.to}
+                            component={RouterLink}
+                            // Pass the correct toggle function here
+                            onClick={link.label === 'Logout' ? handleLogout : toggle}
+                            sx={{ /* ... styles ... */ }}
+                        >
+                            {link.label} {/* {link.icon} */}
+                        </Link>
+                    ))}
+                </Box>
+            )}
+        </TopDrawerMenu>
+    );
+
+    // 2. Register the menu with the Navbar parent
+    // This will only run once on the initial render
+    if (addMenu) {
+        addMenu(accountMenu);
+    }
+
+    // 3. The component's return value is now ONLY the icon
+    return (
+        <AccountIcon open={open} toggle={toggle} />
+    );
+};
+```
+
+### Summary of Changes and Why It Works
+
+1.  **Centralized Rendering:** The `Navbar` is once again in charge of *where* the menus are rendered (in the absolute-positioned `Box`), which fixes the layout and overlay problem.
+2.  **Decentralized Logic:** The `Account` feature is still in charge of *what* is inside its menu and *how* it works (the `isAuth` state).
+3.  **Communication via Props:** The `addMenu` prop is a simple but powerful communication channel. The child feature tells the parent layout, "Here is my menu UI, please render it in the correct place for me."
+
+This pattern maintains the excellent separation of concerns while fixing the practical implementation issue. Now, your account menu should open correctly, and the layout will be preserved. You can apply this exact same `addMenu` pattern when you refactor the other features.

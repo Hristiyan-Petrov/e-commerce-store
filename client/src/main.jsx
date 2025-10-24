@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import HomePage from './pages/Homepage.jsx';
-import Layout from './components/layout/Layout.jsx';
+import Layout from './layout/Layout.jsx';
 
 const theme = createTheme({
     palette: {

@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-// import MainNavigation from '../home/MainNavigation';
 import { Outlet } from 'react-router';
 import Navbar from './navbar/Navbar';
 
@@ -7,7 +6,6 @@ const Layout = () => {
     return (
         <Box>
             <Navbar />
-            {/* <MainNavigation /> */}
             <Outlet />
         </Box>
         // <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

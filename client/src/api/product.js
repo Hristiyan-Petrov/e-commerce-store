@@ -1,8 +1,8 @@
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_PRODUCTS_URL = 'http://localhost:8080/api/products';
 
-export const fetchLatestProducts = async (limit = 5) => {
+export const fetchLatest = async (limit = 5) => {
     try {
-        const response = await fetch(`${BASE_URL}/products/latest?limit=${limit}`);
+        const response = await fetch(`${BASE_PRODUCTS_URL}/latest?limit=${limit}`);
         if (!response.ok) {
             throw new Error('Could not fetch latest products');
         }
@@ -11,4 +11,13 @@ export const fetchLatestProducts = async (limit = 5) => {
         console.log('There was a problem with the fetch operation', error);
         throw error; // Re-throw the error so the component can handle it
     }
+};
+
+export const fetchAll = async () => {
+    return fetch(`${BASE_PRODUCTS_URL}`)
+        .then(res => res.json())
+        .catch(err => {
+            console.log('There was a problem with the fetch operation', err);
+            throw err; // Re-throw the error so the component can handle it
+        })
 };

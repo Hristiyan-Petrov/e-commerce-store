@@ -1,5 +1,4 @@
 export const underlineHoverEffect = (topValue = 2) => ({
-    position: 'relative',
     '&::after': {
         content: '""',
         position: 'absolute',

@@ -2,6 +2,8 @@ require('dotenv').config();
 const { DataSource } = require('typeorm');
 const { Product } = require('./entity/Product');
 
+console.log('DATABASE_URL loaded:', process.env.POSTGRES_HOST);
+
 const AppDataSource = new DataSource({
     type: "postgres",
     host: process.env.POSTGRES_HOST,

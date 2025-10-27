@@ -3,21 +3,27 @@ import { Drawer } from "@mui/material";
 const TopDrawerMenu = ({
     open,
     sx = {},
-    children
+    children,
+    'aria-label': ariaLabel,
+    'aria-hidden': ariaHidden,
+    ...props
 }) => {
     return (
         <Drawer
             open={open}
             anchor="top"
             variant="persistent"
+            role='dialog'
+            aria-label={ariaLabel}
+            aria-hidden={ariaHidden}
             ModalProps={{
-                disablePortal: true,
+                // disablePortal: true,
                 keepMounted: false // Don't keep in the DOM when closed
             }}
             sx={{
                 position: "absolute",
                 width: '100%',
-                ...sx
+                // ...sx
             }}
             PaperProps={{
                 sx: {
@@ -26,6 +32,7 @@ const TopDrawerMenu = ({
                     borderTopColor: 'primary.main',
                 }
             }}
+            {...props}
         >
             {children}
         </Drawer>

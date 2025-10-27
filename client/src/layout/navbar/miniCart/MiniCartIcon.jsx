@@ -3,7 +3,14 @@ import NavIcon from "../../../components/common/NavIcon";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
-export default function MiniCartIcon({ open, toggle }) {
+export default function MiniCartIcon({
+    open,
+    toggle,
+    'aria-label': ariaLabel,
+    'aria-expanded': ariaExpanded,
+    'aria-controls': ariaControls,
+    ...props
+}) {
     const miniCartItems = [
         {
             productId: '123',
@@ -23,8 +30,11 @@ export default function MiniCartIcon({ open, toggle }) {
 
     return (
         <NavIcon
-            open={open}
             toggle={toggle}
+            aria-label={ariaLabel}
+            aria-expanded={ariaExpanded}
+            aria-controls={ariaControls}
+            {...props}
         >
             <Badge
                 badgeContent={miniCartItems.length}

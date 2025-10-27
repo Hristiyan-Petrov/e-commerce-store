@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Box } from "@mui/system";
 import { Typography, Link, Button } from "@mui/material";
 import { Link as RouterLink } from "react-router";
 
-import AccountIcon from "./AccountIcon";
 import TopDrawerMenu from '../../../components/common/TopDrawerMenu';
 
 const accountMenuItems = [
@@ -15,6 +14,9 @@ const accountMenuItems = [
 export default function AccountMenu({
     open,
     toggle,
+    'aria-label': ariaLabel,
+    'aria-hidden': ariaHidden,
+    ...props
 }) {
     const [isAuth, setIsAuth] = useState(false);
 
@@ -27,12 +29,14 @@ export default function AccountMenu({
 
     return (
         <TopDrawerMenu
-            key='account'
             open={open}
             sx={{
                 width: { xs: '100%', sm: '50%', md: '30%', lg: '25%' },
                 right: { sm: 0, xl: '15%' }
             }}
+            aria-label={ariaLabel}
+            aria-hidden={ariaHidden}
+            {...props}
         >
 
             {isAuth && <Box

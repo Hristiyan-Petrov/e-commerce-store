@@ -5,23 +5,31 @@ import { SHOW_MD_DOWN, SHOW_MD_UP } from "../../../constants/breakpoints";
 import { underlineHoverEffect } from "../../../styles/common";
 import { Chip } from "@mui/material";
 
-export default function SearchMenuIcon({ open, toggle }) {
+export default function SearchMenuIcon({
+    open,
+    toggle,
+    'aria-label': ariaLabel,
+    'aria-expanded': ariaExpanded,
+    'aria-controls': ariaControls,
+    ...props
+}) {
     return (
         <>
             <NavIcon
-                open={open}
                 toggle={toggle}
-                sx={{
-                    display: SHOW_MD_DOWN,
-                }}
+                aria-label={ariaLabel}
+                aria-expanded={ariaExpanded}
+                aria-controls={ariaControls}
+                {...props}
             >
-                {open
-                    ? <SearchOffIcon />
-                    : <SearchOutlinedIcon />
+                {
+                    open
+                        ? <SearchOffIcon />
+                        : <SearchOutlinedIcon />
                 }
 
 
-            </NavIcon>
+            </NavIcon >
 
             <Chip
                 sx={{

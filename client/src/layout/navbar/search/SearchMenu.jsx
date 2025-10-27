@@ -6,7 +6,7 @@ import { Link as RouterLink } from "react-router";
 
 const searchRelatedLinks = [
     { label: 'Mice', to: '/shop/mice' },
-    { label: 'Keyborads', to: '/shop/keyboards' },
+    { label: 'Keyboards', to: '/shop/keyboards' },
     { label: 'Monitors', to: '/shop/monitors' },
     { label: 'New Arivals', to: '/shop/new-arrivals' },
 ];
@@ -14,15 +14,21 @@ const searchRelatedLinks = [
 export default function SearchMenu({
     open,
     toggle,
-    products
+    'aria-label': ariaLabel,
+    'aria-hidden': ariaHidden,
+    products = [],
+    ...props
 }) {
     const handleSearch = () => {
         console.log('You clicked search.');
     };
-    
+
     return (
         <TopDrawerMenu
             open={open}
+            aria-label={ariaLabel}
+            aria-hidden={ariaHidden}
+            {...props}
         >
             <Box
                 sx={{
@@ -58,6 +64,7 @@ export default function SearchMenu({
                         </Typography>
                         <CancelOutlinedIcon
                             onClick={toggle}
+                            aria-label="Close search menu"
                         />
                     </Box>
 
@@ -102,9 +109,9 @@ export default function SearchMenu({
                         p: 3
                     }}>
 
-                    {/* <Autocomplete
+                    <Autocomplete
                         component='input'
-                        id="searcg-field"
+                        id="search-field"
                         freeSolo
                         options={products.map(p => p.name)}
                         renderInput={params => (
@@ -125,7 +132,7 @@ export default function SearchMenu({
                         sx={{
                             width: '100%',
                         }}
-                    /> */}
+                    />
                 </Container>
             </Box>
         </TopDrawerMenu>

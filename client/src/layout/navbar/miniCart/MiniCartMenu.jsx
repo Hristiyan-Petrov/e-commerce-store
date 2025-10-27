@@ -6,7 +6,13 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import { Link as RouterLink } from "react-router";
 
-export default function MiniCartMenu({ open, toggle }) {
+export default function MiniCartMenu({
+    open,
+    toggle,
+    'aria-label': ariaLabel,
+    'aria-hidden': ariaHidden,
+    ...props
+}) {
     const miniCartItems = [
         {
             id: '123',
@@ -68,6 +74,9 @@ export default function MiniCartMenu({ open, toggle }) {
     return (
         <TopDrawerMenu
             open={open}
+            aria-label={ariaLabel}
+            aria-hidden={ariaHidden}
+            {...props}
         >
             <Stack
                 py={3}

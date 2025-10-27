@@ -5,13 +5,21 @@ import NavIcon from "../../../components/common/NavIcon";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { SHOW_MOBILE_ONLY } from "../../../constants/breakpoints";
 
-export default function MobileMenuIcon({ open, toggle }) {
+export default function MobileMenuIcon({
+    open,
+    toggle,
+    'aria-label': ariaLabel,
+    'aria-expanded': ariaExpanded,
+    'aria-controls': ariaControls,
+    ...props
+}) {
     return (
         <NavIcon
             toggle={toggle}
-            sx={{
-                display: SHOW_MOBILE_ONLY
-            }}
+            aria-label={ariaLabel}
+            aria-expanded={ariaExpanded}
+            aria-controls={ariaControls}
+            {...props}
         >
 
             <Box sx={{

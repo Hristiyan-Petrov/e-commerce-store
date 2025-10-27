@@ -14,12 +14,17 @@ const navigationLinks = [
 export default function MobileMenu({
     open,
     toggle,
-    addMenu
+    'aria-label': ariaLabel,
+    'aria-hidden': ariaHidden,
+    ...props
 }) {
     return (
         <TopDrawerMenu
             key='mobile-menu'
             open={open}
+            aria-label={ariaLabel}
+            aria-hidden={ariaHidden}
+            {...props}
         >
             <Box
                 sx={{

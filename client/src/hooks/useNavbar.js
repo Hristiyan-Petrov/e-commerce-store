@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useNavbar() {
     const [activeMenu, setActiveMenu] = useState(null);
@@ -7,6 +7,18 @@ export function useNavbar() {
     };
 
     const isMenuOpen = (menuId) => activeMenu === menuId;
+
+    // ESC key closes active menu
+    useEffect(() => {
+        const handleEscape = e => {
+            if (e.key === 'Escape' && activeMenu) {
+                setActiveMenu(null);
+            }
+        };
+
+            document.addEventListener('keydown', handleEscape);
+            return () => document.removeEventListener('keydown', handleEscape)
+    }, [activeMenu]);
 
     return {
         activeMenu,

@@ -1,66 +1,38 @@
-import { AppBar, Autocomplete, Avatar, Badge, Box, Button, Chip, Container, Drawer, IconButton, Link, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Stack, TextField, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, IconButton, Link, Toolbar } from "@mui/material";
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import { Link as RouterLink } from "react-router";
-import { HIDE_MOBILE, SHOW_MD_DOWN, SHOW_MD_UP, SHOW_MOBILE_ONLY } from "../../constants/breakpoints";
-import { useEffect, useState } from "react";
-import { fetchAll } from '../../api/product';
-import { underlineHoverEffect } from '../../styles/common'
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import SearchOffIcon from '@mui/icons-material/SearchOff';
-
-import MobileMenu from "./mobileMenu/MobileMenu.jsx";
-import NavigationIcons from "./NavigationIcons.jsx";
-import AccountIcon from "./account/AccountIcon.jsx";
-import AccountMenu from "./account/AccountMenu.jsx";
-import MobileMenuIcon from "./mobileMenu/MobileMenuIcon.jsx";
-import MiniCartMenu from "./miniCart/MiniCartMenu.jsx";
-import MiniCartIcon from "./miniCart/MiniCartIcon.jsx";
-import SearchMenuIcon from "./search/SearchMenuIcon.jsx";
-import SearchMenu from "./search/SearchMenu.jsx";
+import { HIDE_MOBILE } from "../../constants/breakpoints";
 import { useNavbar } from "../../hooks/useNavbar.js";
 
-const navigationLinks = [
-    { label: 'Shop', to: '/shop' },
-    { label: 'Software', to: '/software' },
-    { label: 'Deals', to: '/shop/deals' },
-];
-
-const NAV_FEATURES = [
-    { id: 'search', Icon: SearchMenuIcon, Menu: SearchMenu },
-    { id: 'account', Icon: AccountIcon, Menu: AccountMenu },
-    { id: 'miniCart', Icon: MiniCartIcon, Menu: MiniCartMenu },
-    { id: 'mobile', Icon: MobileMenuIcon, Menu: MobileMenu },
-];
+import { underlineHoverEffect } from '../../styles/common'
+import { NAV_FEATURES, NAV_LINKS } from "./navConfig.js";
 
 const Navbar = () => {
-    const [products, setProducts] = useState([]);
-
-    // const [activeMenu, setActiveMenu] = useState(null);
-    // const handleMenuToggle = (menuName) => {
-    //     console.log(menuName);
-    //     setActiveMenu(prevMenu => prevMenu === menuName ? null : menuName);
-    // }
-
     const { activeMenu, toggleMenu, isMenuOpen } = useNavbar();
 
-    useEffect(() => {
-        const getProducts = async () => {
-            fetchAll()
-                .then(products => {
-                    setProducts(products);
-                    console.log(products);
+    // const [products, setProducts] = useState([]);
+    // useEffect(() => {
+    //     const getProducts = async () => {
+    //         fetchAll()
+    //             .then(products => {
+    //                 console.log(products);
 
-                })
-                .catch(err => {
-                    console.log('ERROR' + err);
-                })
-        };
+    //             })
+    //             .catch(err => {
+    //                 console.log('ERROR' + err);
+    //             })
+    //     };
 
-        getProducts();
-    }, []);
+    //     getProducts();
+    // }, []);
 
     return (
-        <AppBar sx={{ position: 'static', backgroundColor: 'white' }}>
+        <AppBar
+            sx={{ position: 'static', backgroundColor: 'white' }}
+            component='nav'
+            role="navigation"
+            aria-label="Main navigation"
+        >
             <Toolbar sx={{
                 justifyContent: { xs: "space-between", xl: 'space-evenly' },
             }}>
@@ -70,7 +42,11 @@ const Navbar = () => {
                     alignItems: "center",
                     gap: 5,
                 }}>
-                    <IconButton aria-label="home logo">
+                    <IconButton
+                        component={RouterLink}
+                        to='/'
+                        aria-label="Go to homepage"
+                    >
                         <HomeRoundedIcon fontSize="large" />
                     </IconButton>
 
@@ -79,8 +55,11 @@ const Navbar = () => {
                             display: HIDE_MOBILE,
                             gap: 5,
                             alignItems: 'center',
-                        }}>
-                        {navigationLinks.map(link => (
+                        }}
+                        component='nav'
+                        aria-label="Primary navigation"
+                    >
+                        {NAV_LINKS.map(link => (
                             <Link
                                 key={link.label}
                                 to={link.to}
@@ -99,21 +78,28 @@ const Navbar = () => {
                 </Box>
 
                 {/* Nav Icons */}
-                <Box sx={{
-                    display: "flex",
-                    gap: 1,
-                    alignItems: 'center'
-                }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: 1,
+                        alignItems: 'center'
+                    }}
+                    role='toolbar'
+                    aria-label="Navigation tools"
+                >
                     {NAV_FEATURES.map(x => (
                         <x.Icon
-                            key={x.id}
+                            key={`icon-${x.id}`}
                             open={isMenuOpen(x.id)}
                             toggle={() => toggleMenu(x.id)}
+                            aria-expanded={isMenuOpen(x.id)}
+                            aria-controls={`menu-${x.id}`}
+                            {...x.iconProps}
                         />
                     ))}
                 </Box>
 
-                {/* Menus */}
+                {/* Nav Menus */}
                 <Box
                     sx={{
                         position: 'absolute',
@@ -124,14 +110,22 @@ const Navbar = () => {
                         overflow: 'hidden',
                         pointerEvents: activeMenu ? 'auto' : 'none',
                     }}
+                    role='region'
+                    aria-label='Navigation menus'
                 >
-                    {NAV_FEATURES.map(x => (
-                        <x.Menu
-                            key={x.id}
+                    {NAV_FEATURES.map(x => {
+                        // const isOpen = isMenuOpen(x.id);
+                        // if (!isOpen) return null;
+
+                        return <x.Menu
+                            id={`menu-${x.id}`}
+                            key={`menu-${x.id}`}
                             open={isMenuOpen(x.id)}
                             toggle={() => toggleMenu(x.id)}
+                            aria-hidden={isMenuOpen(x.id)}
+                            {...x.menuProps}
                         />
-                    ))}
+                    })}
                 </Box>
             </Toolbar>
 

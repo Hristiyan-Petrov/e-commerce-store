@@ -4,6 +4,7 @@ import { Link as RouterLink } from "react-router";
 import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
 import MobileMenuIcon from "./MobileMenuIcon";
 import { useEffect } from "react";
+import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
 
 const navigationLinks = [
     { label: 'Shop', to: '/shop' },
@@ -18,6 +19,8 @@ export default function MobileMenu({
     'aria-hidden': ariaHidden,
     ...props
 }) {
+    useCloseOnScroll(open, toggle);
+
     return (
         <TopDrawerMenu
             key='mobile-menu'

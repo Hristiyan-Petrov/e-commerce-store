@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box } from "@mui/system";
 import { Typography, Link, Button } from "@mui/material";
 import { Link as RouterLink } from "react-router";
@@ -26,6 +26,16 @@ export default function AccountMenu({
         setIsAuth(false);
         toggle(); // Close the menu after logging out
     };
+
+    // Hide menu on scroll
+    useEffect(() => {
+        if (!open) return;
+
+        const handleScroll = () => toggle();
+        window.addEventListener('scroll', handleScroll);
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [open, toggle]);
 
     return (
         <TopDrawerMenu

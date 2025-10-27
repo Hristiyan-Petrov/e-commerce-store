@@ -5,6 +5,60 @@ import LocalOffer from '@mui/icons-material/LocalOffer';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import { Link as RouterLink } from "react-router";
+import { useLockBodyScroll } from "../../../hooks/useLockBodyScroll";
+
+const miniCartItems = [
+    {
+        id: '123',
+        name: 'Wireless Keyboard',
+        price: 79.99,
+        image: 'url...',
+        quantity: 2
+    },
+    {
+        id: '45116',
+        name: 'Mouse Pad',
+        price: 29.99,
+        salePrice: 19.99,
+        image: 'url...',
+        quantity: 2
+    },
+    {
+        id: '1234',
+        name: 'Wireless Keyboard',
+        price: 79.99,
+        image: 'url...',
+        quantity: 2
+    },
+    {
+        id: '4564',
+        name: 'Mouse Pad',
+        price: 29.99,
+        image: 'url...',
+        quantity: 1
+    }, {
+        id: '43356',
+        name: 'Mouse Pad',
+        price: 29.99,
+        image: 'url...',
+        quantity: 1
+    },
+    {
+        id: '12e34',
+        name: 'Wireless Keyboard',
+        price: 79.99,
+        image: 'url...',
+        quantity: 2
+    },
+    {
+        id: '4563334',
+        name: 'Mouse Pad',
+        price: 29.99,
+        image: 'url...',
+        quantity: 1
+    }
+
+];
 
 export default function MiniCartMenu({
     open,
@@ -13,58 +67,8 @@ export default function MiniCartMenu({
     'aria-hidden': ariaHidden,
     ...props
 }) {
-    const miniCartItems = [
-        {
-            id: '123',
-            name: 'Wireless Keyboard',
-            price: 79.99,
-            image: 'url...',
-            quantity: 2
-        },
-        {
-            id: '45116',
-            name: 'Mouse Pad',
-            price: 29.99,
-            salePrice: 19.99,
-            image: 'url...',
-            quantity: 2
-        },
-        {
-            id: '1234',
-            name: 'Wireless Keyboard',
-            price: 79.99,
-            image: 'url...',
-            quantity: 2
-        },
-        {
-            id: '4564',
-            name: 'Mouse Pad',
-            price: 29.99,
-            image: 'url...',
-            quantity: 1
-        }, {
-            id: '43356',
-            name: 'Mouse Pad',
-            price: 29.99,
-            image: 'url...',
-            quantity: 1
-        },
-        {
-            id: '12e34',
-            name: 'Wireless Keyboard',
-            price: 79.99,
-            image: 'url...',
-            quantity: 2
-        },
-        {
-            id: '4563334',
-            name: 'Mouse Pad',
-            price: 29.99,
-            image: 'url...',
-            quantity: 1
-        }
 
-    ];
+    useLockBodyScroll(open);
 
     const QuantityStepper = () => (
         <Box>

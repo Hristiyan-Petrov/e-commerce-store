@@ -3,6 +3,7 @@ import { Autocomplete, Box, Container, Divider, List, ListItemButton, ListItemTe
 import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { Link as RouterLink } from "react-router";
+import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll';
 
 const searchRelatedLinks = [
     { label: 'Mice', to: '/shop/mice' },
@@ -19,6 +20,8 @@ export default function SearchMenu({
     products = [],
     ...props
 }) {
+    useLockBodyScroll(open);
+
     const handleSearch = () => {
         console.log('You clicked search.');
     };

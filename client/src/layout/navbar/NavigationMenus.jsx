@@ -5,7 +5,6 @@ export default function NavigationMenus({
     toggleMenu,
     isMenuOpen,
     activeMenu,
-
 }) {
     return (
         <Box

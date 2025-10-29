@@ -4,6 +4,7 @@ import { Typography, Link, Button } from "@mui/material";
 import { Link as RouterLink } from "react-router";
 
 import TopDrawerMenu from '../../../components/common/TopDrawerMenu';
+import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
 
 const accountMenuItems = [
     { label: 'Profile', to: '/profile' },
@@ -27,15 +28,7 @@ export default function AccountMenu({
         toggle(); // Close the menu after logging out
     };
 
-    // Hide menu on scroll
-    useEffect(() => {
-        if (!open) return;
-
-        const handleScroll = () => toggle();
-        window.addEventListener('scroll', handleScroll);
-
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [open, toggle]);
+    useCloseOnScroll(open, toggle);
 
     return (
         <TopDrawerMenu

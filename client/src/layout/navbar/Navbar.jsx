@@ -1,4 +1,4 @@
-import { AppBar, Box, IconButton, Link, Toolbar } from "@mui/material";
+import { AppBar, Box, IconButton, keyframes, Link, Toolbar } from "@mui/material";
 import { useNavbar } from "../../hooks/useNavbar.js";
 
 import NavigationIcons from "./NavigationIcons.jsx";
@@ -33,7 +33,7 @@ const Navbar = () => {
                 top: 0,
                 backgroundColor: 'white',
                 transform: scrollDirection === 'down' ? 'translateY(-100%)' : 'translateY(0)',
-                transition: 'transform 0.3s'
+                transition: 'transform 0.3s',
             }}
             component='nav'
             role="navigation"

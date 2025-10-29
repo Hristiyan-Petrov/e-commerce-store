@@ -1,5 +1,4 @@
 import MobileMenu from "./mobileMenu/MobileMenu.jsx";
-import NavigationIcons from "./NavigationIcons.jsx";
 import AccountIcon from "./account/AccountIcon.jsx";
 import AccountMenu from "./account/AccountMenu.jsx";
 import MobileMenuIcon from "./mobileMenu/MobileMenuIcon.jsx";

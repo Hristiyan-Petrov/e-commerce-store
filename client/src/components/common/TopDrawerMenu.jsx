@@ -23,7 +23,8 @@ const TopDrawerMenu = ({
             sx={{
                 position: "absolute",
                 width: '100%',
-                // ...sx
+                ...sx
+                
             }}
             PaperProps={{
                 sx: {

@@ -1,7 +1,5 @@
 const authService = require('../services/auth');
 
-
-
 function setTokenCookie(res, token) {
     res.cookie('token', token, {
         httpOnly: true,

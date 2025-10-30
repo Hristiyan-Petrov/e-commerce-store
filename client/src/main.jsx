@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import HomePage from './pages/Homepage.jsx';
 import Layout from './layout/Layout.jsx';
 import LoginPage from './pages/Login.jsx';
-import { AuthProvider } from './context/AuthContext.jsx';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 
 const theme = createTheme({
     palette: {
@@ -77,7 +77,25 @@ const theme = createTheme({
         }
 
     }
-})
+});
+
+function GuestRoute({ children }) {
+    const { user, loading } = useAuth();
+
+    if (user)
+        return <Navigate to='/' replace={true} />
+
+    return children;
+};
+
+function PrivateRoute({ children }) {
+    const { user, loading } = useAuth();
+
+    if (user)
+        return <Navigate to='/login' replace={true} />
+
+    return children;
+};
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -88,7 +106,7 @@ createRoot(document.getElementById('root')).render(
                     <Routes>
                         <Route path='/' element={<Layout />} >
                             <Route index element={<HomePage />} />
-                            <Route path='login' element={<LoginPage />} />
+                            <Route path='login' element={<GuestRoute element={<LoginPage />} />} />
                         </Route>
                     </Routes>
                 </BrowserRouter>

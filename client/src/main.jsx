@@ -5,6 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import HomePage from './pages/Homepage.jsx';
 import Layout from './layout/Layout.jsx';
+import LoginPage from './pages/Login.jsx';
 
 const theme = createTheme({
     palette: {
@@ -85,6 +86,7 @@ createRoot(document.getElementById('root')).render(
                 <Routes>
                     <Route path='/' element={<Layout />} >
                         <Route index element={<HomePage />} />
+                        <Route path='login' element={<LoginPage />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

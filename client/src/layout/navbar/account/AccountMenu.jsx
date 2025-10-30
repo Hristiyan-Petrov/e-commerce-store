@@ -81,10 +81,21 @@ export default function AccountMenu({
                     Get access to your account and unlock exclusive offers.
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Button component={RouterLink} to="/login" variant="contained">
+                    <Button
+                        component={RouterLink}
+                        to="/login"
+                        variant="contained"
+                        onClick={() => toggle()}
+                    >
                         Login
                     </Button>
-                    <Button component={RouterLink} to="/register" variant="contained" color="secondary">
+                    <Button
+                        component={RouterLink}
+                        to="/register"
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => toggle()}
+                    >
                         Create Account
                     </Button>
                 </Box>

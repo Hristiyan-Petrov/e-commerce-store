@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import HomePage from './pages/Homepage.jsx';
 import Layout from './layout/Layout.jsx';
 import LoginPage from './pages/Login.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
 
 const theme = createTheme({
     palette: {
@@ -82,14 +83,16 @@ createRoot(document.getElementById('root')).render(
     <StrictMode>
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <BrowserRouter>
-                <Routes>
-                    <Route path='/' element={<Layout />} >
-                        <Route index element={<HomePage />} />
-                        <Route path='login' element={<LoginPage />} />
-                    </Route>
-                </Routes>
-            </BrowserRouter>
+            <AuthProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' element={<Layout />} >
+                            <Route index element={<HomePage />} />
+                            <Route path='login' element={<LoginPage />} />
+                        </Route>
+                    </Routes>
+                </BrowserRouter>
+            </AuthProvider>
         </ThemeProvider>
     </StrictMode>
 )

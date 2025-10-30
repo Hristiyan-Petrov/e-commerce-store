@@ -5,6 +5,7 @@ import { Link as RouterLink } from "react-router";
 
 import TopDrawerMenu from '../../../components/common/TopDrawerMenu';
 import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
+import { useAuth } from "../../../context/AuthContext";
 
 const accountMenuItems = [
     { label: 'Profile', to: '/profile' },
@@ -19,7 +20,7 @@ export default function AccountMenu({
     'aria-hidden': ariaHidden,
     ...props
 }) {
-    const [isAuth, setIsAuth] = useState(false);
+    const { user, loading,  } = useAuth();
 
     const handleLogout = () => {
         // Your logout logic would go here
@@ -42,7 +43,7 @@ export default function AccountMenu({
             {...props}
         >
 
-            {isAuth && <Box
+            {user && <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -70,7 +71,7 @@ export default function AccountMenu({
             </Box>}
 
 
-            {!isAuth && <Box sx={{
+            {!user && <Box sx={{
                 p: 3,
                 textAlign: 'center',
             }}>

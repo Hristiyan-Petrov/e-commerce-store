@@ -2,19 +2,27 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const { AppDataSource } = require('./data-source');
+const cookieParser = require('cookie-parser');
+const { AppDataSource } = require('./db/data-source');
 const productRoutes = require('./routes/product');
+const authRoutes = require('./routes/auth');
+const passport = require('passport');
 
 const app = express();
-app.use(express.json());
-app.use(cors());
+
+// Middlewares
 app.use(helmet());
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true // Allow cookies
+}));
+app.use(express.json());
+app.use(cookieParser());
+app.use(passport.initialize());
 
-app.get('/', (req, res) => {
-    res.status(200).json({message: 'Hello World!'});
-});
-
+// Routes
 app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
 
 const startServer = async () => {
     try {

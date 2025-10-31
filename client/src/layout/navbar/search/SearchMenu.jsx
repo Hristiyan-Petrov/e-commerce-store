@@ -4,6 +4,7 @@ import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { Link as RouterLink } from "react-router";
 import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll';
+import { hoverBackgroundFill } from '../../../styles/common';
 
 const searchRelatedLinks = [
     { label: 'Mice', to: '/shop/mice' },
@@ -78,14 +79,8 @@ export default function SearchMenu({
                                 component={RouterLink}
                                 to={link.to}
                                 sx={{
-                                    maxWidth: '90%',
-                                    transition: 'background-color 0.7s',
-                                    borderRadius: 5,
-                                    '&:hover': {
-                                        cursor: 'pointer',
-                                        backgroundColor: 'primary.light',
-                                        transition: 'background-color 0.2s',
-                                    }
+                                    maxWidth: '95%',
+                                    ...hoverBackgroundFill()
                                 }}
                             >
                                 <KeyboardArrowRightRoundedIcon sx={{

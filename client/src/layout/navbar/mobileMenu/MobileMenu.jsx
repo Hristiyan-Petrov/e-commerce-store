@@ -1,9 +1,7 @@
-import { Box, Link } from "@mui/material";
+import { Box, ListItemButton } from "@mui/material";
 import { Link as RouterLink } from "react-router";
 
 import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
-import MobileMenuIcon from "./MobileMenuIcon";
-import { useEffect } from "react";
 import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
 
 const navigationLinks = [
@@ -36,7 +34,7 @@ export default function MobileMenu({
                 }}>
                 {
                     navigationLinks.map(link => (
-                        <Link
+                        <ListItemButton
                             key={link.label}
                             to={link.to}
                             component={RouterLink}
@@ -51,7 +49,7 @@ export default function MobileMenu({
                             }}
                         >
                             {link.label}
-                        </Link>
+                        </ListItemButton>
                     ))
                 }
             </Box>

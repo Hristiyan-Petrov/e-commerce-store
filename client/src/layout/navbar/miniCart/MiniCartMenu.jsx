@@ -6,6 +6,7 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import { Link as RouterLink } from "react-router";
 import { useLockBodyScroll } from "../../../hooks/useLockBodyScroll";
+import { hoverBackgroundFill } from "../../../styles/common";
 
 const miniCartItems = [
     {
@@ -176,12 +177,7 @@ export default function MiniCartMenu({
                                                         to={`/shop/${product.id}`}
                                                         sx={{
                                                             maxWidth: 'fit-content',
-                                                            borderRadius: 5,
-                                                            transition: 'background-color 0.5s',
-                                                            '&:hover': {
-                                                                transition: 'background-color 0.2s',
-                                                                backgroundColor: 'primary.light'
-                                                            }
+                                                            ...hoverBackgroundFill()
                                                         }}
                                                     >
                                                         <ListItemAvatar>

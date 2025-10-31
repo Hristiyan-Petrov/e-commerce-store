@@ -1,4 +1,3 @@
-// const BASE_PRODUCTS_URL = `${import.meta.env.API_URL}/products`;
 const BASE_PRODUCTS_URL = `${import.meta.env.VITE_API_URL}/products`;
 
 export const fetchLatest = async (limit = 5) => {

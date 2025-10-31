@@ -82,6 +82,8 @@ const theme = createTheme({
 function GuestRoute({ children }) {
     const { user, loading } = useAuth();
 
+    if (loading) return null;
+
     if (user)
         return <Navigate to='/' replace={true} />
 
@@ -90,6 +92,8 @@ function GuestRoute({ children }) {
 
 function PrivateRoute({ children }) {
     const { user, loading } = useAuth();
+
+    if (loading) return null;
 
     if (user)
         return <Navigate to='/login' replace={true} />
@@ -106,7 +110,14 @@ createRoot(document.getElementById('root')).render(
                     <Routes>
                         <Route path='/' element={<Layout />} >
                             <Route index element={<HomePage />} />
-                            <Route path='login' element={<GuestRoute element={<LoginPage />} />} />
+                            <Route
+                                path='login'
+                                element={
+                                    <GuestRoute>
+                                        <LoginPage />
+                                    </GuestRoute>
+                                }
+                            />
                         </Route>
                     </Routes>
                 </BrowserRouter>

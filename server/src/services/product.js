@@ -1,5 +1,5 @@
-const { AppDataSource } = require("../data-source");
-const { Product } = require("../entity/Product");
+const { AppDataSource } = require("../db/data-source");
+const Product = require("../entities/Product");
 const productRepo = AppDataSource.getRepository(Product);
 
 const generalError = 'Error from product service:';

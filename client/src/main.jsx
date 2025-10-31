@@ -7,6 +7,7 @@ import HomePage from './pages/Homepage.jsx';
 import Layout from './layout/Layout.jsx';
 import LoginPage from './pages/Login.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { CartProvider } from './context/CartContext.jsx';
 
 const theme = createTheme({
     palette: {
@@ -106,21 +107,23 @@ createRoot(document.getElementById('root')).render(
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path='/' element={<Layout />} >
-                            <Route index element={<HomePage />} />
-                            <Route
-                                path='login'
-                                element={
-                                    <GuestRoute>
-                                        <LoginPage />
-                                    </GuestRoute>
-                                }
-                            />
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
+                <CartProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path='/' element={<Layout />} >
+                                <Route index element={<HomePage />} />
+                                <Route
+                                    path='login'
+                                    element={
+                                        <GuestRoute>
+                                            <LoginPage />
+                                        </GuestRoute>
+                                    }
+                                />
+                            </Route>
+                        </Routes>
+                    </BrowserRouter>
+                </CartProvider>F
             </AuthProvider>
         </ThemeProvider>
     </StrictMode>

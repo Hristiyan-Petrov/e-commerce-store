@@ -3,10 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 const { AppDataSource } = require('./db/data-source');
 const productRoutes = require('./routes/product');
 const authRoutes = require('./routes/auth');
-const passport = require('passport');
+const cartRoutes = require('./routes/cart');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(passport.initialize());
 // Routes
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
 
 const startServer = async () => {
     try {

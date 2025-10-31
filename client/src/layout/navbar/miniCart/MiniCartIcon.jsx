@@ -2,6 +2,7 @@ import { Badge } from "@mui/material";
 import NavIcon from "../../../components/common/NavIcon";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { useCart } from "../../../context/CartContext";
 
 export default function MiniCartIcon({
     open,
@@ -28,6 +29,8 @@ export default function MiniCartIcon({
         }
     ];
 
+    const { summary } = useCart();
+
     return (
         <NavIcon
             toggle={toggle}
@@ -37,7 +40,7 @@ export default function MiniCartIcon({
             {...props}
         >
             <Badge
-                badgeContent={miniCartItems.length}
+                badgeContent={summary.totalQuantity}
                 color="primary"
                 sx={{
                     '& .MuiBadge-badge': {

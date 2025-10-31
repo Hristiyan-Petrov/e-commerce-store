@@ -1,65 +1,30 @@
-import { Avatar, Box, Button, Container, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
-import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
+import {
+    Avatar,
+    Box,
+    Button,
+    Container,
+    Divider,
+    IconButton,
+    List,
+    ListItem,
+    ListItemAvatar,
+    ListItemButton,
+    ListItemText,
+    Stack,
+    Typography,
+    CircularProgress,
+    Alert,
+} from '@mui/material';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import LocalOffer from '@mui/icons-material/LocalOffer';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
-import { Link as RouterLink } from "react-router";
-import { useLockBodyScroll } from "../../../hooks/useLockBodyScroll";
-import { hoverBackgroundFill } from "../../../styles/common";
-
-const miniCartItems = [
-    {
-        id: '123',
-        name: 'Wireless Keyboard',
-        price: 79.99,
-        image: 'url...',
-        quantity: 2
-    },
-    {
-        id: '45116',
-        name: 'Mouse Pad',
-        price: 29.99,
-        salePrice: 19.99,
-        image: 'url...',
-        quantity: 2
-    },
-    {
-        id: '1234',
-        name: 'Wireless Keyboard',
-        price: 79.99,
-        image: 'url...',
-        quantity: 2
-    },
-    {
-        id: '4564',
-        name: 'Mouse Pad',
-        price: 29.99,
-        image: 'url...',
-        quantity: 1
-    }, {
-        id: '43356',
-        name: 'Mouse Pad',
-        price: 29.99,
-        image: 'url...',
-        quantity: 1
-    },
-    {
-        id: '12e34',
-        name: 'Wireless Keyboard',
-        price: 79.99,
-        image: 'url...',
-        quantity: 2
-    },
-    {
-        id: '4563334',
-        name: 'Mouse Pad',
-        price: 29.99,
-        image: 'url...',
-        quantity: 1
-    }
-
-];
+import { Link as RouterLink } from 'react-router';
+import { useState } from 'react';
+import TopDrawerMenu from '../../../components/common/TopDrawerMenu';
+import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll';
+import { hoverBackgroundFill } from '../../../styles/common';
+import { useCart } from '../../../context/CartContext';
 
 export default function MiniCartMenu({
     open,
@@ -68,13 +33,60 @@ export default function MiniCartMenu({
     'aria-hidden': ariaHidden,
     ...props
 }) {
-
     useLockBodyScroll(open);
 
-    const QuantityStepper = () => (
-        <Box>
-        </Box>
-    );
+    const {
+        cartItems,
+        summary,
+        loading,
+        error,
+        incrementQuantity,
+        decrementQuantity,
+        removeFromCart
+    } = useCart();
+
+    const [updatingItems, setUpdatingItems] = useState(new Set());
+
+    const handleIncrement = async (cartItemId) => {
+        setUpdatingItems(prev => new Set(prev).add(cartItemId));
+        try {
+            await incrementQuantity(cartItemId);
+        } finally {
+            setUpdatingItems(prev => {
+                const next = new Set(prev);
+                next.delete(cartItemId);
+                return next;
+            });
+        }
+    };
+
+    const handleDecrement = async (cartItemId) => {
+        setUpdatingItems(prev => new Set(prev).add(cartItemId));
+        try {
+            await decrementQuantity(cartItemId);
+        } finally {
+            setUpdatingItems(prev => {
+                const next = new Set(prev);
+                next.delete(cartItemId);
+                return next;
+            });
+        }
+    };
+
+    const handleRemove = async (cartItemId) => {
+        setUpdatingItems(prev => new Set(prev).add(cartItemId));
+        try {
+            await removeFromCart(cartItemId);
+        } catch (err) {
+            console.error('Failed to remove item:', err);
+        } finally {
+            setUpdatingItems(prev => {
+                const next = new Set(prev);
+                next.delete(cartItemId);
+                return next;
+            });
+        }
+    };
 
     return (
         <TopDrawerMenu
@@ -85,289 +97,309 @@ export default function MiniCartMenu({
         >
             <Stack
                 py={3}
-                component='section'
+                component="section"
                 sx={{
-
                     backgroundColor: 'secondary.light',
-                    maxHeight: 'calc(100vh - 56px)',
-                    overflowY: 'auto',
+                    // maxHeight: 'calc(100vh - 56px)',
+                    // overflowY: 'auto',
+
+                    height: 'calc(100vh - 56px)',
+
+                    // 2. USE FLEXBOX TO DISTRIBUTE SPACE
+                    display: 'flex',
+                    flexDirection: 'column',
                 }}
             >
-                {miniCartItems.length === 0
-                    ? (
-                        <Container>
-                            <Typography
+                {/* Loading State */}
+                {loading && (
+                    <Container sx={{ textAlign: 'center', py: 4 }}>
+                        <CircularProgress />
+                        <Typography sx={{ mt: 2 }}>Loading cart...</Typography>
+                    </Container>
+                )}
 
-                                sx={{
-                                    letterSpacing: 1.5,
-                                    textAlign: 'center'
-                                }}
-                            >
-                                Your shopping cart is empty.
-                            </Typography>
-                            <Button
-                                variant="contained"
-                                to='/shop'
-                                sx={{
-                                    maxWidth: 'fit-content',
-                                    fontSize: '0.8rem',
-                                    letterSpacing: 2.5,
-                                    px: 3
-                                }}
-                            >
-                                Explore products
-                            </Button>
-                        </Container>
-                    )
-                    // Has items
-                    : (
-                        <Stack
-                            component='section'
-                            mx={3}
+                {/* Error State */}
+                {error && (
+                    <Container>
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {error}
+                        </Alert>
+                    </Container>
+                )}
+
+                {/* Empty Cart */}
+                {!loading && cartItems.length === 0 && (
+                    <Container>
+                        <Typography
                             sx={{
-                                flexDirection: { sm: 'row' },
-                                gap: { sm: 2 },
-                                justifyContent: { sm: "space-between" },
-                                alignItems: { sm: 'flex-start' },
-                                m: { lg: '0 auto' },
-                                minWidth: { lg: '75%', xl: '70%' },
+                                letterSpacing: 1.5,
+                                textAlign: 'center',
+                                mb: 3,
                             }}
                         >
-                            <Box
-                                component='section'
+                            Your shopping cart is empty.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            component={RouterLink}
+                            to="/shop"
+                            onClick={toggle}
+                            sx={{
+                                maxWidth: 'fit-content',
+                                fontSize: '0.8rem',
+                                letterSpacing: 2.5,
+                                px: 3,
+                            }}
+                        >
+                            Explore products
+                        </Button>
+                    </Container>
+                )}
+
+                {/* Cart Items */}
+                {!loading && cartItems.length > 0 && (
+                    <Stack
+                        component="section"
+                        mx={3}
+                        sx={{
+                            flexDirection: { sm: 'row' },
+                            gap: { sm: 2 },
+                            justifyContent: { sm: 'space-between' },
+                            alignItems: { sm: 'flex-start' },
+                            m: { lg: '0 auto' },
+                            minWidth: { lg: '75%', xl: '70%' },
+                        }}
+                    >
+                        {/* Cart Items List */}
+                        <Box
+                            component="section"
+                            sx={{
+                                flex: { sm: 5 },
+                            }}
+                        >
+                            <Typography
+                                variant="h6"
                                 sx={{
-                                    flex: { sm: 5 }
+                                    textAlign: 'center',
                                 }}
                             >
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    Your shopping cart
-                                </Typography>
+                                Your shopping cart
+                            </Typography>
 
-                                <List>
-                                    {miniCartItems.map(product => {
-                                        const isOnSale = product.salePrice && product.salePrice < product.price;
-                                        const finalPrice = isOnSale ? product.salePrice : product.price;
-                                        const itemSubtotal = (finalPrice * product.quantity).toFixed(2);
+                            <List>
+                                {cartItems.map((item) => {
+                                    const isOnSale = item.product.salePrice &&
+                                        item.product.salePrice < item.product.price;
+                                    const isUpdating = updatingItems.has(item.id);
 
-                                        return (
-                                            <ListItem
-                                                key={product.id}
-                                                disablePadding
+                                    return (
+                                        <ListItem
+                                            key={item.id}
+                                            disablePadding
+                                            sx={{
+                                                my: 2,
+                                                borderRadius: 3,
+                                                backgroundColor: 'background.paper',
+                                                opacity: isUpdating ? 0.6 : 1,
+                                            }}
+                                        >
+                                            <Box
                                                 sx={{
-                                                    my: 2,
-                                                    borderRadius: 3,
-                                                    backgroundColor: 'background.paper',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: 2,
+                                                    p: 2,
+                                                    width: '100%',
                                                 }}
                                             >
-                                                <Box
+                                                {/* Product Info */}
+                                                <ListItemButton
+                                                    component={RouterLink}
+                                                    to={`/shop/${item.product.id}`}
+                                                    onClick={toggle}
                                                     sx={{
-                                                        display: 'flex',
-                                                        flexDirection: 'column',
-                                                        gap: 2,
-                                                        p: 2,
-                                                        width: '100%'
+                                                        maxWidth: 'fit-content',
+                                                        ...hoverBackgroundFill(),
                                                     }}
                                                 >
-                                                    <ListItemButton
-                                                        to={`/shop/${product.id}`}
-                                                        sx={{
-                                                            maxWidth: 'fit-content',
-                                                            ...hoverBackgroundFill()
-                                                        }}
-                                                    >
-                                                        <ListItemAvatar>
-                                                            <Avatar
-                                                                variant="rounded"
-                                                                src={product.image}
-                                                                alt={product.name}
-                                                            />
-                                                        </ListItemAvatar>
+                                                    <ListItemAvatar>
+                                                        <Avatar
+                                                            variant="rounded"
+                                                            src={item.product.imageUrl}
+                                                            alt={item.product.name}
+                                                        />
+                                                    </ListItemAvatar>
 
-                                                        <ListItemText
-                                                            primaryTypographyProps={{ component: 'div' }}
-                                                            secondaryTypographyProps={{ component: 'div' }}
-                                                            primary={
-                                                                <Stack direction="row" alignItems="center" spacing={1}>
-                                                                    <Typography fontWeight='bold'>{product.name}</Typography>
-                                                                    {isOnSale && <LocalOffer color="primary" />}
-                                                                </Stack>
-                                                            }
-                                                            secondary={
-                                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                                    {isOnSale && (
-                                                                        <Typography
-                                                                            variant="body2"
-                                                                            sx={{ textDecoration: 'line-through', mr: 1 }}
-                                                                        >
-                                                                            ${product.price.toFixed(2)}
-                                                                        </Typography>
-                                                                    )}
+                                                    <ListItemText
+                                                        primaryTypographyProps={{ component: 'div' }}
+                                                        secondaryTypographyProps={{ component: 'div' }}
+                                                        primary={
+                                                            <Stack direction="row" alignItems="center" spacing={1}>
+                                                                <Typography fontWeight="bold">
+                                                                    {item.product.name}
+                                                                </Typography>
+                                                                {isOnSale && <LocalOffer color="primary" />}
+                                                            </Stack>
+                                                        }
+                                                        secondary={
+                                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                                {isOnSale && (
                                                                     <Typography
                                                                         variant="body2"
-                                                                        color='text.primary'
+                                                                        sx={{ textDecoration: 'line-through', mr: 1 }}
                                                                     >
-                                                                        ${finalPrice.toFixed(2)}
+                                                                        ${item.product.price.toFixed(2)}
                                                                     </Typography>
-                                                                </Stack>
-                                                            }
-                                                        />
-                                                    </ListItemButton>
+                                                                )}
+                                                                <Typography variant="body2" color="text.primary">
+                                                                    ${item.finalPrice.toFixed(2)}
+                                                                </Typography>
+                                                            </Stack>
+                                                        }
+                                                    />
+                                                </ListItemButton>
 
-                                                    {/* Section 2: Quantity Setter and Subtotal */}
+                                                {/* Quantity Controls & Subtotal */}
+                                                <Box
+                                                    sx={{
+                                                        width: '100%',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                    }}
+                                                >
+                                                    {/* Quantity Stepper */}
                                                     <Box
                                                         sx={{
-                                                            width: '100%',
+                                                            borderRadius: 10,
+                                                            borderColor: 'secondary.light',
+                                                            borderStyle: 'solid',
+                                                            borderWidth: 2,
+                                                            px: 1,
                                                             display: 'flex',
-                                                            alignItems: "center",
-                                                            justifyContent: 'space-between'
+                                                            alignItems: 'center',
                                                         }}
                                                     >
-                                                        {/* Quatity Setter (Omitted for brevity, assumed unchanged) */}
-                                                        <Box
-                                                            sx={{
-                                                                borderRadius: 10,
-                                                                borderColor: 'secondary.light',
-                                                                borderStyle: 'solid',
-                                                                borderWidth: 2,
-                                                                px: 1,
-                                                                display: 'flex',
-                                                                alignItems: 'center'
-                                                            }}
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleDecrement(item.id)}
+                                                            disabled={isUpdating || item.quantity <= 1}
                                                         >
-                                                            <IconButton size="small">
-                                                                <RemoveOutlinedIcon fontSize="small" />
-                                                            </IconButton>
-                                                            <Typography variant='subtitle1'>
-                                                                {product.quantity}
-                                                            </Typography>
-                                                            <IconButton size="small">
-                                                                <AddOutlinedIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Box>
-
-                                                        {/* Item Subtotal Calculation */}
-                                                        <Typography
-                                                            variant='subtitle1'
-                                                            fontWeight='bold'
-                                                            color='text.primary'
-                                                        >
-                                                            ${itemSubtotal}
+                                                            <RemoveOutlinedIcon fontSize="small" />
+                                                        </IconButton>
+                                                        <Typography variant="subtitle1" sx={{ minWidth: '2ch', textAlign: 'center' }}>
+                                                            {item.quantity}
                                                         </Typography>
-
-                                                        <IconButton>
-                                                            <DeleteOutlineRoundedIcon />
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleIncrement(item.id)}
+                                                            disabled={isUpdating}
+                                                        >
+                                                            <AddOutlinedIcon fontSize="small" />
                                                         </IconButton>
                                                     </Box>
-                                                </Box>
-                                            </ListItem>
-                                        );
-                                    })}
-                                </List>
-                            </Box>
 
-                            {/* Summary */}
-                            <Box
-                                component='section'
+                                                    {/* Item Subtotal */}
+                                                    <Typography
+                                                        variant="subtitle1"
+                                                        fontWeight="bold"
+                                                        color="text.primary"
+                                                    >
+                                                        ${item.subtotal.toFixed(2)}
+                                                    </Typography>
+
+                                                    {/* Remove Button */}
+                                                    <IconButton
+                                                        onClick={() => handleRemove(item.id)}
+                                                        disabled={isUpdating}
+                                                    >
+                                                        <DeleteOutlineRoundedIcon />
+                                                    </IconButton>
+                                                </Box>
+                                            </Box>
+                                        </ListItem>
+                                    );
+                                })}
+                            </List>
+                        </Box>
+
+                        {/* Summary */}
+                        <Box
+                            component="section"
+                            sx={{
+                                flex: { sm: 3 },
+                                position: { sm: 'sticky' },
+                                top: 0,
+                            }}
+                        >
+                            <Typography
+                                variant="h6"
                                 sx={{
-                                    flex: { sm: 3 },
-                                    position: { sm: 'sticky' },
-                                    top: 0
+                                    textAlign: 'center',
+                                    letterSpacing: 1.5,
                                 }}
                             >
+                                Summary
+                            </Typography>
+                            <Box
+                                sx={{
+                                    mt: 3,
+                                    p: 3,
+                                    backgroundColor: 'background.paper',
+                                    borderRadius: 3,
+                                }}
+                            >
+                                {summary.totalSavings > 0 && (
+                                    <>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                            }}
+                                        >
+                                            <Typography>Total Savings:</Typography>
+                                            <Typography color="success.main" fontWeight="bold">
+                                                ${summary.totalSavings.toFixed(2)}
+                                            </Typography>
+                                        </Box>
+                                        <Divider sx={{ mt: 3 }} />
+                                    </>
+                                )}
 
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        textAlign: 'center',
-                                        letterSpacing: 1.5,
-                                    }}
-                                >
-                                    Summary
-                                </Typography>
                                 <Box
                                     sx={{
                                         mt: 3,
-                                        p: 3,
-                                        backgroundColor: 'background.paper',
-                                        borderRadius: 3,
-                                    }}>
-
-                                    <Box
-                                        sx={{
-                                            // mt: 3,
-                                            display: 'flex',
-                                            justifyContent: "space-between"
-                                        }}>
-
-                                        <Typography>
-                                            Total Savings:
-                                        </Typography>
-                                        <Typography
-
-                                        >
-                                            ${miniCartItems
-                                                .filter(i => i.salePrice)
-                                                .reduce((acc, i) => {
-                                                    return acc + (i.price - i.salePrice) * i.quantity;
-                                                }, 0).toFixed(2)}
-                                        </Typography>
-                                    </Box>
-                                    <Divider
-                                        sx={{
-                                            mt: 3
-                                        }}
-                                    />
-                                    <Box
-                                        sx={{
-                                            mt: 3,
-                                            display: 'flex',
-                                            justifyContent: "space-between",
-                                        }}>
-
-                                        <Typography
-                                            fontWeight="bold"
-
-                                        >
-                                            Total:
-                                        </Typography>
-                                        <Typography
-                                            fontWeight="bold"
-
-                                        >
-                                            ${miniCartItems.reduce((acc, curr) => {
-                                                const price = curr.salePrice ? curr.salePrice : curr.price;
-                                                return acc + price * curr.quantity;
-                                            }, 0).toFixed(2)}
-                                        </Typography>
-                                    </Box>
-
-                                </Box>
-                                <Box
-                                    mt={3}
-                                    mb={7}
-                                    sx={{
-                                        px: { xs: 4, sm: 0 }
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
                                     }}
                                 >
-                                    <Button
-                                        variant="contained"
-                                        fullWidth
-                                        to="/checkout"
-                                        component={RouterLink} // Use RouterLink if available
-                                    >
-                                        Proceed to Checkout
-                                    </Button>
+                                    <Typography fontWeight="bold">Total:</Typography>
+                                    <Typography fontWeight="bold">
+                                        ${summary.subtotal.toFixed(2)}
+                                    </Typography>
                                 </Box>
                             </Box>
 
-                        </Stack>
-                    )}
-
+                            <Box
+                                mt={3}
+                                mb={7}
+                                sx={{
+                                    px: { xs: 4, sm: 0 },
+                                }}
+                            >
+                                <Button
+                                    variant="contained"
+                                    fullWidth
+                                    component={RouterLink}
+                                    to="/checkout"
+                                    onClick={toggle}
+                                >
+                                    Proceed to Checkout
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Stack>
+                )}
             </Stack>
         </TopDrawerMenu>
     );

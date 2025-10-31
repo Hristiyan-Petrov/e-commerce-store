@@ -1,5 +1,5 @@
 import { Box, Stack, useMediaQuery, useTheme } from "@mui/system";
-import { Typography, Link, Button, Avatar, ListItemButton, ListItemText } from "@mui/material";
+import { Typography, Button, Avatar, ListItemButton, ListItemText } from "@mui/material";
 import { Link as RouterLink } from "react-router";
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
@@ -12,7 +12,7 @@ import { hoverBackgroundFill } from "../../../styles/common";
 const accountMenuItems = [
     { label: 'Profile', to: '/profile' },
     { label: 'Settings', to: '/settings' },
-    { label: 'Logout', to: '#', icon: <LogoutRoundedIcon /> },
+    { label: 'Logout', icon: <LogoutRoundedIcon />, action: 'logout' },
 ];
 
 export default function AccountMenu({
@@ -22,17 +22,23 @@ export default function AccountMenu({
     'aria-hidden': ariaHidden,
     ...props
 }) {
-    const { user, loading, } = useAuth();
+    const { user, logout } = useAuth();
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-
-    const handleLogout = () => {
-        // Your logout logic would go here
-        console.log('User logged out.');
-        setIsAuth(false);
-        toggle(); // Close the menu after logging out
+    const handleItemClick = (action) => {
+        if (action === 'logout') {
+            logout()
+                .then(() => {
+                    console.log('User logged out.')
+                })
+                .catch(err => {
+                    console.log('Logout attempt completed with error:', err);
+                });
+        }
+        // Always close the drawer on any item click
+        toggle();
     };
 
     useCloseOnScroll(open, toggle);
@@ -82,9 +88,12 @@ export default function AccountMenu({
                             return (
                                 <ListItemButton
                                     key={item.label}
-                                    to={item.to}
-                                    component={RouterLink}
-                                    onClick={toggle}
+                                    {...(item.to && {
+                                        to: item.to,
+                                        component: RouterLink
+                                    })
+                                    }
+                                    onClick={() => handleItemClick(item.action)}
                                     sx={isSmallScreen ? SmallScreenStyles : hoverBackgroundFill()}
                                 >
                                     {isSmallScreen ? (
@@ -135,7 +144,8 @@ export default function AccountMenu({
                             </Button>
                         </Box>
                     </Box>
-                )}
+                )
+            }
         </TopDrawerMenu >
     );
 };

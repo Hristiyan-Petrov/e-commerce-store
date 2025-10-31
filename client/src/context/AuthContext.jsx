@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { api } from "../api/fetcher";
+import authApi from "../api/auth";
 
 const AuthContext = createContext(null);
 
@@ -18,8 +19,17 @@ export function AuthProvider({ children }) {
         loadUser();
     }, []);
 
+    const logout = () => {
+        return authApi.logout()
+            .then(() => setUser(null))
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading }}>
+        <AuthContext.Provider value={{ user, loading, logout }}>
             {children}
         </AuthContext.Provider>
     )

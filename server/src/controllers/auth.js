@@ -50,8 +50,15 @@ const getCurrentUser = async (req, res) => {
     }
 };
 
+const logout = (req, res) => {
+    console.log('Logout from server');
+    
+    res.clearCookie('token');
+    res.json({ message: 'Loggout out successfully' });
+};
+
 module.exports = {
     handleGoogleCallback,
     getCurrentUser,
-
+    logout
 };

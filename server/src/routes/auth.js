@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('../config/passport');
-const { handleGoogleCallback, getCurrentUser } = require('../controllers/auth');
+const { handleGoogleCallback, getCurrentUser, logout } = require('../controllers/auth');
 
 const router = express.Router();
 
@@ -18,5 +18,10 @@ router.get('/google/callback',
 );
 
 router.get('/me', getCurrentUser);
+
+router.get('/logout',
+    // Protected,
+    logout
+);
 
 module.exports = router;

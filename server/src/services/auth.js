@@ -38,7 +38,7 @@ module.exports = {
 
     findOrCreateGoogleUser: async (profile) => {
         // Scenario 1
-        let user = await userRepository.findOneBy({
+        let user = await userRepo.findOneBy({
             googleId: profile.id
         });
 
@@ -48,7 +48,7 @@ module.exports = {
 
         // Scenario 2
         // Check if email is already registered with email/password
-        const existingEmailUser = await userRepository.findOneBy({
+        const existingEmailUser = await userRepo.findOneBy({
             email: profile.emails[0].value,
         });
 
@@ -56,20 +56,20 @@ module.exports = {
             // Link Google account to existing user
             existingEmailUser.googleId = profile.id;
             existingEmailUser.picture = profile.photos[0]?.value;
-            await userRepository.save(existingEmailUser);
+            await userRepo.save(existingEmailUser);
             return existingEmailUser;
         }
 
         // Scenario 3
         // Create new user
-        const newUser = userRepository.create({
+        const newUser = userRepo.create({
             googleId: profile.id,
             email: profile.emails[0].value,
             name: profile.displayName,
             picture: profile.photos[0]?.value,
         });
 
-        await userRepository.save(newUser);
+        await userRepo.save(newUser);
         return newUser;
     },
 } 

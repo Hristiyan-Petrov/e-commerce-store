@@ -1,21 +1,43 @@
 const { AppDataSource } = require('../db/data-source');
-const CartItem = require('../entities/CartItem');
-const Product = require('../entities/Product');
 const { ENTITY_NAMES } = require('../utils/constants');
 
-class CartService {
-    constructor() {
-        this.cartItemRepository = AppDataSource.getRepository(ENTITY_NAMES.CART_ITEM);
-        this.productRepository = AppDataSource.getRepository(ENTITY_NAMES.PRODUCT);
-    }
+const cartItemRepository = AppDataSource.getRepository(ENTITY_NAMES.CART_ITEM);
+const productRepository = AppDataSource.getRepository(ENTITY_NAMES.PRODUCT);
 
+const calculateItemSubtotal = (cartItem) => {
+    const price = cartItem.product.salePrice || cartItem.product.price;
+    return parseFloat((parseFloat(price) * cartItem.quantity).toFixed(2));
+};
+
+const formatCartItem = (cartItem) => {
+    return {
+        id: cartItem.id,
+        quantity: cartItem.quantity,
+        product: {
+            id: cartItem.product.id,
+            name: cartItem.product.name,
+            price: parseFloat(cartItem.product.price),
+            salePrice: cartItem.product.salePrice
+                ? parseFloat(cartItem.product.salePrice)
+                : null,
+            imageUrl: cartItem.product.imageUrl,
+        },
+        finalPrice: cartItem.product.salePrice
+            ? parseFloat(cartItem.product.salePrice)
+            : parseFloat(cartItem.product.price),
+        subtotal: calculateItemSubtotal(cartItem),
+    };
+};
+
+
+module.exports = {
     /**
      * Get user's cart with product details
      * @param {number} userId - User ID
      * @returns {Promise<Array>} Cart items with product details
      */
-    async getUserCart(userId) {
-        const cartItems = await this.cartItemRepository.find({
+    getUserCartItems: async (userId) => {
+        const cartItems = await cartItemRepository.find({
             where: { userId },
             relations: ['product'],
             order: { createdAt: 'DESC' },
@@ -36,9 +58,9 @@ class CartService {
             finalPrice: item.product.salePrice
                 ? parseFloat(item.product.salePrice)
                 : parseFloat(item.product.price),
-            subtotal: this.calculateItemSubtotal(item),
+            subtotal: calculateItemSubtotal(item),
         }));
-    }
+    },
 
     /**
      * Add item to cart or update quantity if already exists
@@ -47,9 +69,9 @@ class CartService {
      * @param {number} quantity - Quantity to add (default: 1)
      * @returns {Promise<Object>} Updated cart item
      */
-    async addToCart(userId, productId, quantity = 1) {
+    addToCart: async (userId, productId, quantity = 1) => {
         // Validate product exists
-        const product = await this.productRepository.findOne({
+        const product = await productRepository.findOne({
             where: { id: productId },
         });
 
@@ -58,7 +80,7 @@ class CartService {
         }
 
         // Check if item already in cart
-        const existingItem = await this.cartItemRepository.findOne({
+        const existingItem = await cartItemRepository.findOne({
             where: { userId, productId },
             relations: ['product'],
         });
@@ -66,28 +88,27 @@ class CartService {
         if (existingItem) {
             // Update quantity
             existingItem.quantity += quantity;
-            await this.cartItemRepository.save(existingItem);
-
-            return this.formatCartItem(existingItem);
+            await cartItemRepository.save(existingItem);
+            return formatCartItem(existingItem);
         }
 
         // Create new cart item
-        const newItem = this.cartItemRepository.create({
+        const newItem = cartItemRepository.create({
             userId,
             productId,
             quantity,
         });
 
-        await this.cartItemRepository.save(newItem);
+        await cartItemRepository.save(newItem);
 
-        // Fetch with relations
-        const savedItem = await this.cartItemRepository.findOne({
+        // Fetch with relations for a complete object
+        const savedItem = await cartItemRepository.findOne({
             where: { id: newItem.id },
             relations: ['product'],
         });
 
-        return this.formatCartItem(savedItem);
-    }
+        return formatCartItem(savedItem);
+    },
 
     /**
      * Update cart item quantity
@@ -96,12 +117,12 @@ class CartService {
      * @param {number} quantity - New quantity
      * @returns {Promise<Object>} Updated cart item
      */
-    async updateCartItemQuantity(userId, cartItemId, quantity) {
+    updateCartItemQuantity: async (userId, cartItemId, quantity) => {
         if (quantity < 1) {
             throw new Error('Quantity must be at least 1');
         }
 
-        const cartItem = await this.cartItemRepository.findOne({
+        const cartItem = await cartItemRepository.findOne({
             where: { id: cartItemId, userId },
             relations: ['product'],
         });
@@ -111,10 +132,10 @@ class CartService {
         }
 
         cartItem.quantity = quantity;
-        await this.cartItemRepository.save(cartItem);
+        await cartItemRepository.save(cartItem);
 
-        return this.formatCartItem(cartItem);
-    }
+        return formatCartItem(cartItem);
+    },
 
     /**
      * Remove item from cart
@@ -122,8 +143,8 @@ class CartService {
      * @param {number} cartItemId - Cart item ID
      * @returns {Promise<boolean>} Success status
      */
-    async removeFromCart(userId, cartItemId) {
-        const cartItem = await this.cartItemRepository.findOne({
+    removeFromCart: async (userId, cartItemId) => {
+        const cartItem = await cartItemRepository.findOne({
             where: { id: cartItemId, userId },
         });
 
@@ -131,27 +152,27 @@ class CartService {
             throw new Error('Cart item not found');
         }
 
-        await this.cartItemRepository.remove(cartItem);
+        await cartItemRepository.remove(cartItem);
         return true;
-    }
+    },
 
     /**
      * Clear entire cart for user
      * @param {number} userId - User ID
      * @returns {Promise<boolean>} Success status
      */
-    async clearCart(userId) {
-        await this.cartItemRepository.delete({ userId });
+    clearCart: async (userId) => {
+        await cartItemRepository.delete({ userId });
         return true;
-    }
+    },
 
     /**
      * Get cart summary (totals, savings, item count)
      * @param {number} userId - User ID
      * @returns {Promise<Object>} Cart summary
      */
-    async getCartSummary(userId) {
-        const cartItems = await this.getUserCart(userId);
+    getCartSummary: async (userId) => {
+        const cartItems = await module.exports.getUserCart(userId);
 
         const summary = cartItems.reduce(
             (acc, item) => {
@@ -185,40 +206,5 @@ class CartService {
             totalSavings: parseFloat(summary.totalSavings.toFixed(2)),
             originalTotal: parseFloat(summary.originalTotal.toFixed(2)),
         };
-    }
-
-    /**
-     * Helper: Calculate item subtotal
-     * @private
-     */
-    calculateItemSubtotal(cartItem) {
-        const price = cartItem.product.salePrice || cartItem.product.price;
-        return parseFloat((parseFloat(price) * cartItem.quantity).toFixed(2));
-    }
-
-    /**
-     * Helper: Format cart item for response
-     * @private
-     */
-    formatCartItem(cartItem) {
-        return {
-            id: cartItem.id,
-            quantity: cartItem.quantity,
-            product: {
-                id: cartItem.product.id,
-                name: cartItem.product.name,
-                price: parseFloat(cartItem.product.price),
-                salePrice: cartItem.product.salePrice
-                    ? parseFloat(cartItem.product.salePrice)
-                    : null,
-                imageUrl: cartItem.product.imageUrl,
-            },
-            finalPrice: cartItem.product.salePrice
-                ? parseFloat(cartItem.product.salePrice)
-                : parseFloat(cartItem.product.price),
-            subtotal: this.calculateItemSubtotal(cartItem),
-        };
-    }
-}
-
-module.exports = new CartService();
+    },
+};

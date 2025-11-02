@@ -55,17 +55,11 @@ const ProductCard = ({ product }) => {
         e.preventDefault(); // Prevent card click
         e.stopPropagation();
 
-        // Check if user is logged in
-        if (!user) {
-            navigate('/login');
-            return;
-        }
-
         setIsAdding(true);
         setShowError(false);
 
         try {
-            await addToCart(id, 1);
+            await addToCart(id, 1, product);
             setShowSuccess(true);
         } catch (error) {
             console.error('Failed to add to cart:', error);

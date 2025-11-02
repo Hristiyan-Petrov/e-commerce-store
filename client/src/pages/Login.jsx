@@ -14,6 +14,8 @@ import GoogleIcon from '../components/common/GoogleIcon';
 import { underlineHoverEffect } from '../styles/common';
 
 const LoginPage = () => {
+    const { summary, isMerging } = useCart();
+
     const handleGoogleLogin = () => {
         const API_URL = import.meta.env.VITE_API_URL;
         window.location.href = `${API_URL}/auth/google`;
@@ -21,6 +23,19 @@ const LoginPage = () => {
 
     return (
         <Container component="main" maxWidth="lg">
+            {summary.itemCount > 0 && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    You have {summary.itemCount} item(s) in your cart.
+                    Sign in to save them!
+                </Alert>
+            )}
+
+            {isMerging && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    Merging your cart...
+                </Alert>
+            )}
+
             <Box
                 sx={{
                     marginTop: 8,

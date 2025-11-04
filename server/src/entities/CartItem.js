@@ -16,7 +16,8 @@ module.exports = new EntitySchema({
         },
         productId: {
             name: 'product_id',
-            type: 'int'
+            type: 'int',
+            nullable: true
         },
         quantity: {
             type: 'int',
@@ -30,7 +31,7 @@ module.exports = new EntitySchema({
         updatedAt: {
             name: 'updated_at',
             type: 'timestamp',
-            createDate: true,
+            updateDate: true,
         },
     },
     relations: {
@@ -45,5 +46,12 @@ module.exports = new EntitySchema({
             target: 'Product',
             joinColumn: { name: 'product_id' },
         }
-    }
+    },
+    // User can't have duplicate products in cart
+    uniques: [
+        {
+            name: 'unique_user_product',
+            columns: ['userId', 'productId']
+        }
+    ]
 });

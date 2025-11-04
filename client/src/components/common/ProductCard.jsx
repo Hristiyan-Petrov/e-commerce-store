@@ -28,7 +28,6 @@ const ProductCard = ({ product }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // Defensive destructuring with default values
     const {
         id,
         name = 'Untitled Product',
@@ -37,12 +36,10 @@ const ProductCard = ({ product }) => {
         imageUrl
     } = product;
 
-    // Ensure prices are numbers
     const displayPrice = Number(price);
     const displaySalePrice = salePrice ? Number(salePrice) : null;
     const hasSale = displaySalePrice && displaySalePrice < displayPrice;
 
-    // Helper function for clean formatting
     const formatPrice = (value) => {
         const numericValue = Number(value);
         if (isNaN(numericValue)) {
@@ -52,20 +49,14 @@ const ProductCard = ({ product }) => {
     };
 
     const handleAddToCart = async (e) => {
-        e.preventDefault(); // Prevent card click
         e.stopPropagation();
-
-        // Check if user is logged in
-        if (!user) {
-            navigate('/login');
-            return;
-        }
+        e.preventDefault();
 
         setIsAdding(true);
         setShowError(false);
 
         try {
-            await addToCart(id, 1);
+            await addToCart(id, 1, product);
             setShowSuccess(true);
         } catch (error) {
             console.error('Failed to add to cart:', error);
@@ -79,9 +70,10 @@ const ProductCard = ({ product }) => {
     return (
         <>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                {/* Part 1: Clickable area for navigation */}
                 <CardActionArea
-                    sx={{ flexGrow: 1 }}
                     onClick={() => navigate(`/shop/${id}`)}
+                    sx={{ flexGrow: 1 }}
                 >
                     <CardMedia
                         component="img"
@@ -96,7 +88,7 @@ const ProductCard = ({ product }) => {
                             },
                         }}
                     />
-                    <CardContent sx={{ flexGrow: 1 }}>
+                    <CardContent>
                         <Typography
                             gutterBottom
                             variant="h6"
@@ -105,16 +97,22 @@ const ProductCard = ({ product }) => {
                         >
                             {name}
                         </Typography>
-                        <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
-                            sx={{
-                                '& > :last-child': {
-                                    marginLeft: 'auto',
-                                },
-                            }}
-                        >
+                    </CardContent>
+                </CardActionArea>
+
+                {/* Part 2: Actions area (price and add to cart button) */}
+                <CardContent>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={{
+                            '& > :last-child': {
+                                marginLeft: 'auto',
+                            },
+                        }}
+                    >
+                        <Box>
                             <Typography
                                 variant="h6"
                                 color={hasSale ? 'red' : 'text.primary'}
@@ -130,33 +128,34 @@ const ProductCard = ({ product }) => {
                                     {formatPrice(displayPrice)}
                                 </Typography>
                             )}
-                            <IconButton
-                                onClick={handleAddToCart}
-                                disabled={isAdding}
-                                sx={{
-                                    backgroundColor: 'secondary.light',
-                                    '&:hover': {
-                                        backgroundColor: 'primary.light',
-                                    },
-                                    '&.Mui-disabled': {
-                                        backgroundColor: 'action.disabledBackground',
-                                    },
-                                }}
-                            >
-                                {isAdding ? (
-                                    <CircularProgress size={24} />
-                                ) : showSuccess ? (
-                                    <CheckCircleIcon color="success" />
-                                ) : (
-                                    <AddShoppingCartRoundedIcon />
-                                )}
-                            </IconButton>
-                        </Stack>
-                    </CardContent>
-                </CardActionArea>
+                        </Box>
+                        
+                        <IconButton
+                            onClick={handleAddToCart}
+                            disabled={isAdding}
+                            sx={{
+                                backgroundColor: 'secondary.light',
+                                '&:hover': {
+                                    backgroundColor: 'primary.light',
+                                },
+                                '&.Mui-disabled': {
+                                    backgroundColor: 'action.disabledBackground',
+                                },
+                            }}
+                        >
+                            {isAdding ? (
+                                <CircularProgress size={24} />
+                            ) : showSuccess ? (
+                                <CheckCircleIcon color="success" />
+                            ) : (
+                                <AddShoppingCartRoundedIcon />
+                            )}
+                        </IconButton>
+                    </Stack>
+                </CardContent>
             </Card>
 
-            {/* Success Snackbar */}
+            {/* Snackbars */}
             <Snackbar
                 open={showSuccess}
                 autoHideDuration={2000}
@@ -172,7 +171,6 @@ const ProductCard = ({ product }) => {
                 </Alert>
             </Snackbar>
 
-            {/* Error Snackbar */}
             <Snackbar
                 open={showError}
                 autoHideDuration={3000}

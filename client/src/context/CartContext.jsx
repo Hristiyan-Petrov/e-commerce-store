@@ -24,6 +24,8 @@ export function CartProvider({ children }) {
 
     // Load cart when component mounts or user changes
     useEffect(() => {
+        if (isMerging) return;
+
         if (user) {
             const guestCartItems = getGuestCartItems();
             if (guestCartItems.length > 0) {
@@ -126,8 +128,8 @@ export function CartProvider({ children }) {
         } catch (error) {
             console.error('Failed to merge cart:', error);
             setError(error.message);
-            await loadServerCartItems();
         } finally {
+            await loadServerCartItems();
             setIsMerging(false);
         }
     };
@@ -198,7 +200,7 @@ export function CartProvider({ children }) {
                 if (itemIndex !== -1) {
                     guestCartItems[itemIndex].quantity = quantity;
                     guestCartItems[itemIndex].subtotal = guestCartItems[itemIndex].finalPrice * quantity;
-                    saveGuestCartItems();
+                    saveGuestCartItems(guestCartItems);
                     loadGuestCartItems();
                 }
             }

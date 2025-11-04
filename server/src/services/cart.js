@@ -171,8 +171,8 @@ module.exports = {
      * @param {number} userId - User ID
      * @returns {Promise<Object>} Cart summary
      */
-    getCartSummary: async (userId) => {
-        const cartItems = await module.exports.getUserCart(userId);
+    getCartSummary: async function (userId) {
+        const cartItems = await this.getUserCartItems(userId);
 
         const summary = cartItems.reduce(
             (acc, item) => {
@@ -207,4 +207,88 @@ module.exports = {
             originalTotal: parseFloat(summary.originalTotal.toFixed(2)),
         };
     },
+
+    /**
+    * Merge guest cart with user cart upon login.
+    * @param {number} userId - User ID
+    * @param {Array} guestCartItems - Array of items from guest cart
+    * @returns {Promise<Object>} Updated cart info and merge results
+    */
+    mergeCarts: async function (userId, guestCartItems) {
+        const mergeResults = {
+            merged: 0,
+            added: 0,
+            failed: [],
+        };
+
+        if (!guestCartItems || guestCartItems.length === 0) {
+            const cartItems = await this.getUserCartItems(userId);
+            const summary = await this.getCartSummary(userId);
+            return { cartItems, summary, mergeResults };
+        }
+
+        
+
+
+        const userServerCartItems = await cartItemRepository.find({
+            where: { userId }
+        });
+
+        for (const guestItem of guestCartItems) {
+            try {
+                const currItemId = guestItem.productId;
+
+                // Validate product still exists
+                const product = await productRepository.findOne({
+                    where: { id: currItemId }
+                });
+
+                if (!product) {
+                    mergeResults.failed.push({
+                        productId: currItemId,
+                        reason: 'Product no longer available'
+                    });
+                    continue; // Skip to next guest item
+                }
+
+                // Check if item already in user's cart
+                // const existingItem = userServerCartItems.find(x => x.productId === currItemId);
+                const existingItem = await cartItemRepository.findOne({
+                    where: { userId, productId: currItemId }
+                });
+
+                if (existingItem) {
+                    // Merge quantities
+                    existingItem.quantity += guestItem.quantity;
+                    await cartItemRepository.save(existingItem);
+                    mergeResults.merged++;
+                } else {
+                    // Add as new item
+                    const newItem = cartItemRepository.create({
+                        userId,
+                        productId: currItemId,
+                        quantity: guestItem.quantity
+                    });
+                    await cartItemRepository.save(newItem);
+                    userServerCartItems.push(newItem);
+                    mergeResults.added++;
+                }
+            } catch (error) {
+                console.error('Failed to merge item:', error);
+                // mergeResults.failed.push({
+                //     productId: guestItem.productId,
+                //     reason: 'Merge failed'
+                // });
+            }
+        }
+
+        console.log('Merging carts result: ' + mergeResults);
+        return {
+            cartItems: await this.getUserCartItems(userId),
+            summary: await this.getCartSummary(userId),
+            mergeResults
+        };
+    },
+
+
 };

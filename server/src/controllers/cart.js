@@ -208,8 +208,32 @@ module.exports = {
         }
     },
 
-    mergeGuestCart: async(req, res) => {
+    mergeCarts: async (req, res) => {
+        try {
+            const userId = req.user.userId;
+            const { guestCartItems } = req.body;
 
+            if (!Array.isArray(guestCartItems)) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid guest cart items'
+                });
+            }
+
+            const result = await cartService.mergeCarts(userId, guestCartItems);
+
+            res.json({
+                success: true,
+                ...result,
+                message: `Cart merged: ${result.mergeResults.merged} updated, ${result.mergeResults.added} added`
+            });
+        } catch (error) {
+            console.error('Merge carts error: ', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to merge carts'
+            });
+        }
     },
 
 

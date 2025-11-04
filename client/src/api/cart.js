@@ -7,5 +7,5 @@ export default {
     updateItemQuantity: (cartItemId, quantity) => api.put(`/cart/${cartItemId}`, { quantity }),
     removeFromCart: (cartItemId) => api.delete(`/cart/${cartItemId}`),
     clearCart: () => api.delete('/cart'),
-    mergeCarts: (guestCartItems) => api.post('/merge', { guestCartItems }),
+    mergeCarts: (guestCartItems) => api.post('/cart/merge', { guestCartItems }),
 };

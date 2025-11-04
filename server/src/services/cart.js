@@ -70,44 +70,48 @@ module.exports = {
      * @returns {Promise<Object>} Updated cart item
      */
     addToCart: async (userId, productId, quantity = 1) => {
-        // Validate product exists
-        const product = await productRepository.findOne({
-            where: { id: productId },
+        return await AppDataSource.transaction(async (transactionalEnityManager) => {
+
+            // Validate product exists
+            const product = await transactionalEnityManager.findOne(ENTITY_NAMES.PRODUCT, {
+                where: { id: productId },
+            });
+
+            if (!product) {
+                throw new Error('Product not found');
+            }
+
+            // Check if item already in cart
+            const existingItem = await transactionalEnityManager.findOne(ENTITY_NAMES.CART_ITEM, {
+                where: { userId, productId },
+                // Lock the row to prevent interference
+                lock: { mode: 'pessimistic_write' }
+            });
+
+            let savedItem;
+            if (existingItem) {
+                // Update quantity
+                existingItem.quantity += quantity;
+                savedItem = await transactionalEnityManager.save(ENTITY_NAMES.CART_ITEM, existingItem);
+                // return formatCartItem(existingItem);
+            } else {
+                // Create new cart item
+                const newItem = transactionalEnityManager.create(ENTITY_NAMES.CART_ITEM, {
+                    userId,
+                    productId,
+                    quantity,
+                });
+                savedItem = await transactionalEnityManager.save(ENTITY_NAMES.CART_ITEM, newItem);
+            }
+
+            // Fetch with relations for a complete object
+            const fullItem = await transactionalEnityManager.findOne(ENTITY_NAMES.CART_ITEM, {
+                where: { id: savedItem.id },
+                relations: ['product'],
+            });
+
+            return formatCartItem(fullItem);
         });
-
-        if (!product) {
-            throw new Error('Product not found');
-        }
-
-        // Check if item already in cart
-        const existingItem = await cartItemRepository.findOne({
-            where: { userId, productId },
-            relations: ['product'],
-        });
-
-        if (existingItem) {
-            // Update quantity
-            existingItem.quantity += quantity;
-            await cartItemRepository.save(existingItem);
-            return formatCartItem(existingItem);
-        }
-
-        // Create new cart item
-        const newItem = cartItemRepository.create({
-            userId,
-            productId,
-            quantity,
-        });
-
-        await cartItemRepository.save(newItem);
-
-        // Fetch with relations for a complete object
-        const savedItem = await cartItemRepository.findOne({
-            where: { id: newItem.id },
-            relations: ['product'],
-        });
-
-        return formatCartItem(savedItem);
     },
 
     /**
@@ -122,19 +126,26 @@ module.exports = {
             throw new Error('Quantity must be at least 1');
         }
 
-        const cartItem = await cartItemRepository.findOne({
-            where: { id: cartItemId, userId },
-            relations: ['product'],
+        return AppDataSource.transaction(async (transactionalEnityManager) => {
+            const cartItem = await transactionalEnityManager.findOne(ENTITY_NAMES.CART_ITEM, {
+                where: { id: cartItemId, userId },
+                lock: { mode: 'pessimistic_write' }
+            });
+
+            if (!cartItem) {
+                throw new Error('Cart item not found');
+            }
+
+            cartItem.quantity = quantity;
+            await transactionalEnityManager.save(ENTITY_NAMES.CART_ITEM, cartItem);
+
+            const fullItem = await transactionalEnityManager.findOne(ENTITY_NAMES.CART_ITEM, {
+                where: { id: cartItemId },
+                relations: ['product'],
+            });
+
+            return formatCartItem(fullItem);
         });
-
-        if (!cartItem) {
-            throw new Error('Cart item not found');
-        }
-
-        cartItem.quantity = quantity;
-        await cartItemRepository.save(cartItem);
-
-        return formatCartItem(cartItem);
     },
 
     /**
@@ -227,19 +238,12 @@ module.exports = {
             return { cartItems, summary, mergeResults };
         }
 
-        
-
-
-        const userServerCartItems = await cartItemRepository.find({
-            where: { userId }
-        });
-
-        for (const guestItem of guestCartItems) {
-            try {
+        await AppDataSource.transaction(async (transactionalEnityManager) => {
+            for (const guestItem of guestCartItems) {
                 const currItemId = guestItem.productId;
 
                 // Validate product still exists
-                const product = await productRepository.findOne({
+                const product = await transactionalEnityManager.findOne(ENTITY_NAMES.PRODUCT, {
                     where: { id: currItemId }
                 });
 
@@ -251,36 +255,29 @@ module.exports = {
                     continue; // Skip to next guest item
                 }
 
-                // Check if item already in user's cart
-                // const existingItem = userServerCartItems.find(x => x.productId === currItemId);
-                const existingItem = await cartItemRepository.findOne({
-                    where: { userId, productId: currItemId }
+                // Pessimistic lock
+                const existingItem = await transactionalEnityManager.findOne(ENTITY_NAMES.CART_ITEM, {
+                    where: { userId, productId: currItemId },
+                    lock: { mode: 'pessimistic_write' } // Lock the row to prevent interference
                 });
 
                 if (existingItem) {
                     // Merge quantities
                     existingItem.quantity += guestItem.quantity;
-                    await cartItemRepository.save(existingItem);
+                    await transactionalEnityManager.save(ENTITY_NAMES.CART_ITEM, existingItem);
                     mergeResults.merged++;
                 } else {
                     // Add as new item
-                    const newItem = cartItemRepository.create({
+                    const newItem = transactionalEnityManager.create(ENTITY_NAMES.CART_ITEM, {
                         userId,
                         productId: currItemId,
                         quantity: guestItem.quantity
                     });
-                    await cartItemRepository.save(newItem);
-                    userServerCartItems.push(newItem);
+                    await transactionalEnityManager.save(ENTITY_NAMES.CART_ITEM, newItem);
                     mergeResults.added++;
                 }
-            } catch (error) {
-                console.error('Failed to merge item:', error);
-                // mergeResults.failed.push({
-                //     productId: guestItem.productId,
-                //     reason: 'Merge failed'
-                // });
-            }
-        }
+            };
+        });
 
         console.log('Merging carts result: ' + mergeResults);
         return {

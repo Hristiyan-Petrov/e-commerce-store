@@ -8,10 +8,12 @@ import {
     Divider,
     IconButton,
     Stack,
+    Alert,
 } from '@mui/material';
 import { Facebook, GitHub } from '@mui/icons-material';
 import GoogleIcon from '../components/common/GoogleIcon';
 import { underlineHoverEffect } from '../styles/common';
+import { useCart } from '../context/CartContext';
 
 const LoginPage = () => {
     const { summary, isMerging } = useCart();

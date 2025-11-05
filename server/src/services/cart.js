@@ -43,23 +43,7 @@ module.exports = {
             order: { createdAt: 'DESC' },
         });
 
-        // Map to include computed fields
-        return cartItems.map(item => ({
-            id: item.id,
-            quantity: item.quantity,
-            product: {
-                id: item.product.id,
-                name: item.product.name,
-                price: parseFloat(item.product.price),
-                salePrice: item.product.salePrice ? parseFloat(item.product.salePrice) : null,
-                imageUrl: item.product.imageUrl,
-            },
-            // Computed fields
-            finalPrice: item.product.salePrice
-                ? parseFloat(item.product.salePrice)
-                : parseFloat(item.product.price),
-            subtotal: calculateItemSubtotal(item),
-        }));
+        return cartItems.map(i => formatCartItem(i));
     },
 
     /**
@@ -178,27 +162,53 @@ module.exports = {
     },
 
     /**
-     * Get cart summary (totals, savings, item count)
-     * @param {number} userId - User ID
-     * @returns {Promise<Object>} Cart summary
-     */
+ * Get cart summary (totals, savings, item count)
+ * @param {number} userId - User ID
+ * @returns {Promise<Object>} Cart summary
+ */
     getCartSummary: async function (userId) {
-        const cartItems = await this.getUserCartItems(userId);
+        const itemsForCalculation = await cartItemRepository.find({
+            where: { userId },
+            relations: ['product'],
+            select: {
+                quantity: true,
+                product: {
+                    price: true,
+                    salePrice: true,
+                },
+            },
+        });
 
-        const summary = cartItems.reduce(
+        // Handle the case of an empty cart to avoid reduce on empty array with no initial value.
+        if (!itemsForCalculation || itemsForCalculation.length === 0) {
+            return {
+                itemCount: 0,
+                totalQuantity: 0,
+                subtotal: 0,
+                totalSavings: 0,
+                originalTotal: 0,
+            };
+        }
+
+        const summary = itemsForCalculation.reduce(
             (acc, item) => {
-                const itemPrice = item.product.price * item.quantity;
-                const itemFinalPrice = item.finalPrice * item.quantity;
-                const itemSavings = item.product.salePrice
-                    ? (item.product.price - item.product.salePrice) * item.quantity
-                    : 0;
+                const finalPrice = item.product.salePrice
+                    ? parseFloat(item.product.salePrice)
+                    : parseFloat(item.product.price);
+
+                const originalPrice = parseFloat(item.product.price);
+
+                const itemFinalPrice = finalPrice * item.quantity;
+                const itemOriginalPrice = originalPrice * item.quantity;
+
+                const itemSavings = (originalPrice - finalPrice) * item.quantity;
 
                 return {
                     itemCount: acc.itemCount + 1,
                     totalQuantity: acc.totalQuantity + item.quantity,
                     subtotal: acc.subtotal + itemFinalPrice,
                     totalSavings: acc.totalSavings + itemSavings,
-                    originalTotal: acc.originalTotal + itemPrice,
+                    originalTotal: acc.originalTotal + itemOriginalPrice,
                 };
             },
             {
@@ -212,11 +222,29 @@ module.exports = {
 
         return {
             ...summary,
-            // Format to 2 decimal places
             subtotal: parseFloat(summary.subtotal.toFixed(2)),
             totalSavings: parseFloat(summary.totalSavings.toFixed(2)),
             originalTotal: parseFloat(summary.originalTotal.toFixed(2)),
         };
+
+        // // Query builder for the most efficient operation - database-side aggregation
+        // const summary = await cartItemRepository.createQueryBuilder("cartItem")
+        //     .leftJoinAndSelect("cartItem.product", "product")
+        //     .select("COUNT(cartItem.id)", "itemCount")
+        //     .addSelect("SUM(cartItem.quantity)", "totalQuantity")
+        //     .addSelect("SUM(COALESCE(product.salePrice, product.price) * cartItem.quantity)", "subtotal")
+        //     .addSelect("SUM((product.price - COALESCE(product.salePrice, product.price)) * cartItem.quantity)", "totalSavings")
+        //     .addSelect("SUM(product.price * cartItem.quantity)", "originalTotal")
+        //     .where("cartItem.userId = :userId", { userId })
+        //     .getRawOne(); // .getRawOne() returns a single object with the results
+
+        // return {
+        //     itemCount: parseInt(summary.itemCount, 10) || 0,
+        //     totalQuantity: parseInt(summary.totalQuantity, 10) || 0,
+        //     subtotal: parseFloat(summary.subtotal) || 0,
+        //     totalSavings: parseFloat(summary.totalSavings) || 0,
+        //     originalTotal: parseFloat(summary.originalTotal) || 0,
+        // };
     },
 
     /**

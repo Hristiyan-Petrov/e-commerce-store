@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
 import cartApi from '../api/cart';
 
@@ -22,27 +22,11 @@ export function CartProvider({ children }) {
 
     const { user } = useAuth();
 
-    // Load cart when component mounts or user changes
-    useEffect(() => {
-        if (isMerging) return;
-
-        if (user) {
-            const guestCartItems = getGuestCartItems();
-            if (guestCartItems.length > 0) {
-                mergeGuestCart(guestCartItems);
-            } else {
-                loadServerCartItems();
-            }
-        } else {
-            loadGuestCartItems();
-        }
-    }, [user]);
-
     // ============================================
     // GUEST CART FUNCTIONS (localStorage)
     // ============================================
 
-    const getGuestCartItems = () => {
+    const getGuestCartItems = useCallback(() => {
         try {
             const currentItems = localStorage.getItem(GUEST_CART_KEY);
             return currentItems ? JSON.parse(currentItems) : [];
@@ -50,29 +34,21 @@ export function CartProvider({ children }) {
             console.error('Failed to parse guest cart:', error);
             return [];
         }
-    };
+    }, []);
 
-    const saveGuestCartItems = (items) => {
+    const saveGuestCartItems = useCallback((items) => {
         try {
             localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
         } catch (error) {
             console.error('Failed to save guest cart:', error);
         }
-    };
+    }, []);
 
-    const clearGuestCart = () => {
+    const clearGuestCart = useCallback(() => {
         localStorage.removeItem(GUEST_CART_KEY);
-    };
+    }, []);
 
-    const loadGuestCartItems = () => {
-        const guestCartItems = getGuestCartItems();
-        setCartItems(guestCartItems);
-
-        const guestSummary = calculateGuestCartSummary(guestCartItems);
-        setSummary(guestSummary);
-    };
-
-    const calculateGuestCartSummary = (cartItems) => {
+    const calculateGuestCartSummary = useCallback((cartItems) => {
         return cartItems.reduce((acc, curr) => ({
             itemCount: acc.itemCount + 1,
             totalQuantity: acc.totalQuantity + curr.quantity,
@@ -87,13 +63,21 @@ export function CartProvider({ children }) {
                 totalSavings: 0,
                 originalTotal: 0
             });
-    };
+    }, []);
+
+    const loadGuestCartItems = useCallback(() => {
+        const guestCartItems = getGuestCartItems();
+        setCartItems(guestCartItems);
+
+        const guestSummary = calculateGuestCartSummary(guestCartItems);
+        setSummary(guestSummary);
+    }, [getGuestCartItems, calculateGuestCartSummary]);
 
     // ============================================
     // SERVER CART FUNCTIONS (authenticated)
     // ============================================
 
-    const loadServerCartItems = async () => {
+    const loadServerCartItems = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -110,9 +94,9 @@ export function CartProvider({ children }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const mergeGuestCart = async (guestCartItems) => {
+    const mergeGuestCart = useCallback(async (guestCartItems) => {
         setIsMerging(true);
         setError(null);
 
@@ -128,17 +112,33 @@ export function CartProvider({ children }) {
         } catch (error) {
             console.error('Failed to merge cart:', error);
             setError(error.message);
-        } finally {
             await loadServerCartItems();
+        } finally {
             setIsMerging(false);
         }
-    };
+    }, [clearGuestCart, loadServerCartItems]);
+
+    // Load cart when component mounts or user changes
+    useEffect(() => {
+        if (isMerging) return;
+
+        if (user) {
+            const guestCartItems = getGuestCartItems();
+            if (guestCartItems.length > 0) {
+                mergeGuestCart(guestCartItems);
+            } else {
+                loadServerCartItems();
+            }
+        } else {
+            loadGuestCartItems();
+        }
+    }, [user, isMerging, getGuestCartItems, mergeGuestCart, loadServerCartItems, loadGuestCartItems]);
 
     // ============================================
     // GUEST AND LOGGED IN FUNCTIONS
     // ============================================F
 
-    const addToCart = async (productId, quantity = 1, productData) => {
+    const addToCart = useCallback(async (productId, quantity = 1, productData) => {
         try {
             // User logged in - add to server cart
             if (user) {
@@ -179,9 +179,9 @@ export function CartProvider({ children }) {
             console.error('Failed to add to cart:', error);
             throw error;
         }
-    };
+    }, [user, getGuestCartItems, saveGuestCartItems, loadGuestCartItems]);
 
-    const updateQuantity = async (cartItemId, quantity) => {
+    const updateQuantity = useCallback(async (cartItemId, quantity) => {
         try {
             if (user) {
                 const response = await cartApi.updateItemQuantity(cartItemId, quantity);
@@ -208,23 +208,23 @@ export function CartProvider({ children }) {
             console.error('Failed to update quantity:', error);
             throw error;
         }
-    };
+    }, [user, getGuestCartItems, saveGuestCartItems, loadGuestCartItems]);
 
-    const incrementQuantity = async (cartItemId) => {
+    const incrementQuantity = useCallback(async (cartItemId) => {
         const item = cartItems.find(i => i.id === cartItemId);
         if (item) {
             await updateQuantity(cartItemId, item.quantity + 1);
         }
-    };
+    }, [cartItems, updateQuantity]);
 
-    const decrementQuantity = async (cartItemId) => {
+    const decrementQuantity = useCallback(async (cartItemId) => {
         const item = cartItems.find(i => i.id === cartItemId);
         if (item && item.quantity > 1) {
             await updateQuantity(cartItemId, item.quantity - 1);
         }
-    };
+    }, [cartItems, updateQuantity]);
 
-    const removeFromCart = async (cartItemId) => {
+    const removeFromCart = useCallback(async (cartItemId) => {
         try {
             if (user) {
                 const response = await cartApi.removeFromCart(cartItemId);
@@ -243,21 +243,38 @@ export function CartProvider({ children }) {
             console.error('Failed to remove from cart:', error);
             throw error;
         }
-    };
+    }, [user, getGuestCartItems, saveGuestCartItems, loadGuestCartItems]);
 
-    const value = {
+    const refreshCart = useCallback(() => (
+        user ? loadServerCartItems : loadGuestCartItems
+    ), [user, loadServerCartItems, loadGuestCartItems]);
+
+    const value = useMemo(() => (
+        {
+            cartItems,
+            summary,
+            loading,
+            error,
+            isMerging,
+            isGuest: !user,
+            addToCart,
+            incrementQuantity,
+            decrementQuantity,
+            removeFromCart,
+            refreshCart
+        }
+    ), [
         cartItems,
         summary,
         loading,
         error,
         isMerging,
-        isGuest: !user,
         addToCart,
         incrementQuantity,
         decrementQuantity,
         removeFromCart,
-        refreshCart: user ? loadServerCartItems : loadGuestCartItems,
-    };
+        refreshCart
+    ]);
 
     return (
         <CartContext.Provider value={value}>

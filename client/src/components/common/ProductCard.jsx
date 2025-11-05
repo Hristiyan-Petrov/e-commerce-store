@@ -10,6 +10,8 @@ import {
     CircularProgress,
     Snackbar,
     Alert,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -66,6 +68,12 @@ const ProductCard = ({ product }) => {
             setIsAdding(false);
         }
     };
+
+    const theme = useTheme();
+    const isDesktop = useMediaQuery(theme.breakpoints.up('sm'));
+    const responsiveAnchor = isDesktop
+        ? { vertical: 'bottom', horizontal: 'right' }
+        : { vertical: 'bottom', horizontal: 'center' };
 
     return (
         <>
@@ -129,7 +137,7 @@ const ProductCard = ({ product }) => {
                                 </Typography>
                             )}
                         </Box>
-                        
+
                         <IconButton
                             onClick={handleAddToCart}
                             disabled={isAdding}
@@ -160,7 +168,7 @@ const ProductCard = ({ product }) => {
                 open={showSuccess}
                 autoHideDuration={2000}
                 onClose={() => setShowSuccess(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                anchorOrigin={responsiveAnchor}
             >
                 <Alert
                     onClose={() => setShowSuccess(false)}
@@ -175,7 +183,7 @@ const ProductCard = ({ product }) => {
                 open={showError}
                 autoHideDuration={3000}
                 onClose={() => setShowError(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                anchorOrigin={responsiveAnchor}
             >
                 <Alert
                     onClose={() => setShowError(false)}

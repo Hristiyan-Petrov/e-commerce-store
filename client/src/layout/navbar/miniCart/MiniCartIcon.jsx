@@ -12,23 +12,6 @@ export default function MiniCartIcon({
     'aria-controls': ariaControls,
     ...props
 }) {
-    const miniCartItems = [
-        {
-            productId: '123',
-            name: 'Wireless Keyboard',
-            price: 79.99,
-            image: 'url...',
-            quantity: 2
-        },
-        {
-            productId: '456',
-            name: 'Mouse Pad',
-            price: 29.99,
-            image: 'url...',
-            quantity: 1
-        }
-    ];
-
     const { summary } = useCart();
 
     return (

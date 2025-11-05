@@ -10,31 +10,17 @@ async function apiFetch(endpoint, options = {}) {
         credentials: 'include'
     };
 
-    try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const data = await response.json();
 
-        if (response.status === 401) {
-            const currentPath = window.location.pathname;
-            if (currentPath !== '/login' && currentPath !== 'register') {
-                window.location.href = '/login';
-            }
-            throw new Error('Unauthorized');
-        }
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || 'Request from client failed');
-        }
-
-        return data;
-    } catch (error) {
-        // If it's a network error or parsing error, throw it
-        if (error.message === 'Unauthorized') {
-            throw error;
-        }
-        throw new Error('Network error or server is down');
+    if (!response.ok) {
+        const error = new Error(data.error || 'Request failed');
+        error.status = response.status;
+        error.response = { status: response.status, data };
+        throw error;
     }
+
+    return data;
 };
 
 export const api = {

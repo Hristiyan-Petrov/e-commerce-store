@@ -47,10 +47,10 @@ export default function MiniCartMenu({
 
     const [updatingItems, setUpdatingItems] = useState(new Set());
 
-    const handleIncrement = async (cartItemId) => {
+    const handleCartOperation = async (operation, cartItemId) => {
         setUpdatingItems(prev => new Set(prev).add(cartItemId));
         try {
-            await incrementQuantity(cartItemId);
+            await operation(cartItemId);
         } finally {
             setUpdatingItems(prev => {
                 const next = new Set(prev);
@@ -58,34 +58,18 @@ export default function MiniCartMenu({
                 return next;
             });
         }
+    };
+
+    const handleIncrement = async (cartItemId) => {
+        await handleCartOperation(incrementQuantity, cartItemId);
     };
 
     const handleDecrement = async (cartItemId) => {
-        setUpdatingItems(prev => new Set(prev).add(cartItemId));
-        try {
-            await decrementQuantity(cartItemId);
-        } finally {
-            setUpdatingItems(prev => {
-                const next = new Set(prev);
-                next.delete(cartItemId);
-                return next;
-            });
-        }
+        await handleCartOperation(decrementQuantity, cartItemId);
     };
 
     const handleRemove = async (cartItemId) => {
-        setUpdatingItems(prev => new Set(prev).add(cartItemId));
-        try {
-            await removeFromCart(cartItemId);
-        } catch (err) {
-            console.error('Failed to remove item:', err);
-        } finally {
-            setUpdatingItems(prev => {
-                const next = new Set(prev);
-                next.delete(cartItemId);
-                return next;
-            });
-        }
+        await handleCartOperation(removeFromCart, cartItemId);
     };
 
     return (
@@ -101,7 +85,7 @@ export default function MiniCartMenu({
                 sx={{
                     backgroundColor: 'secondary.light',
                     // maxHeight: 'calc(100vh - 56px)',
-                    // overflowY: 'auto',
+                    overflowY: 'auto',
 
                     height: 'calc(100vh - 56px)',
 
@@ -248,11 +232,11 @@ export default function MiniCartMenu({
                                                                         variant="body2"
                                                                         sx={{ textDecoration: 'line-through', mr: 1 }}
                                                                     >
-                                                                        ${item.product.price.toFixed(2)}
+                                                                        ${Number(item.product.price).toFixed(2)}
                                                                     </Typography>
                                                                 )}
                                                                 <Typography variant="body2" color="text.primary">
-                                                                    ${item.finalPrice.toFixed(2)}
+                                                                    {Number(item.finalPrice).toFixed(2)}
                                                                 </Typography>
                                                             </Stack>
                                                         }

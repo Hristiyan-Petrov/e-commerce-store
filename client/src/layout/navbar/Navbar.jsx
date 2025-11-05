@@ -10,22 +10,6 @@ const Navbar = () => {
     const { activeMenu, toggleMenu, isMenuOpen } = useNavbar();
     const scrollDirection = useScrollDirection();
 
-    // const [products, setProducts] = useState([]);
-    // useEffect(() => {
-    //     const getProducts = async () => {
-    //         fetchAll()
-    //             .then(products => {
-    //                 console.log(products);
-
-    //             })
-    //             .catch(err => {
-    //                 console.log('ERROR' + err);
-    //             })
-    //     };
-
-    //     getProducts();
-    // }, []);
-
     return (
         <AppBar
             sx={{

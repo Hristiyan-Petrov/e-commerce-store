@@ -4,7 +4,7 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// All cart routes require authentication
+// All server cart routes require authentication
 router.use(authenticateToken);
 
 router.get('/', (req, res) => cartController.getCart(req, res));

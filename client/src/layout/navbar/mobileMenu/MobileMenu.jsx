@@ -3,12 +3,7 @@ import { Link as RouterLink } from "react-router";
 
 import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
 import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
-
-const navigationLinks = [
-    { label: 'Shop', to: '/shop' },
-    { label: 'Software', to: '/software' },
-    { label: 'Deals', to: '/shop/deals' },
-];
+import { NAV_LINKS } from "../navConfig";
 
 export default function MobileMenu({
     open,
@@ -33,7 +28,7 @@ export default function MobileMenu({
                     flexDirection: 'column',
                 }}>
                 {
-                    navigationLinks.map(link => (
+                    NAV_LINKS.map(link => (
                         <ListItemButton
                             key={link.label}
                             to={link.to}

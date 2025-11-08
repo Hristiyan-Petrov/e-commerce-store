@@ -7,12 +7,12 @@ import MiniCartIcon from "./miniCart/MiniCartIcon.jsx";
 import SearchMenuIcon from "./search/SearchMenuIcon.jsx";
 import SearchMenu from "./search/SearchMenu.jsx";
 import { SHOW_MD_DOWN, SHOW_MOBILE_ONLY } from "../../constants/breakpoints.js";
-import { fetchAll } from "../../api/product.js";
+import { ROUTES } from '../../constants/routes.js';
 
 export const NAV_LINKS = [
-    { label: 'Shop', to: '/shop' },
-    { label: 'Software', to: '/software' },
-    { label: 'Deals', to: '/shop/deals' },
+    { label: 'Shop', to: ROUTES.PRODUCTS.SHOP },
+    { label: 'Software', to: ROUTES.PRODUCTS.SOFTWARE },
+    { label: 'Deals', to: ROUTES.PRODUCTS.DEALS},
 ];
 
 export const NAV_FEATURES = [
@@ -29,7 +29,7 @@ export const NAV_FEATURES = [
         },
         menuProps: {
             'aria-label': 'Search products',
-            products: await fetchAll()
+            // products: await fetchAll()
             // role: 'dialog'
         }
     },

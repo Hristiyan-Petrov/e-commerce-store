@@ -1,6 +1,7 @@
 import { Box, Button, Divider, Typography } from "@mui/material";
 import { Link as RouterLink } from 'react-router';
 import { useCart } from "../../../../context/CartContext";
+import { ROUTES } from "../../../../constants/routes";
 
 export default function CartSummary({
     summary,
@@ -74,7 +75,7 @@ export default function CartSummary({
                     variant="contained"
                     fullWidth
                     component={RouterLink}
-                    to="/checkout"
+                    to={ROUTES.CHECKOUT}
                     onClick={toggle}
                 >
                     Proceed to Checkout

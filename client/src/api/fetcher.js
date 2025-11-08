@@ -1,3 +1,5 @@
+import { API_CONFIG } from "../constants/api";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 async function apiFetch(endpoint, options = {}) {
@@ -10,7 +12,7 @@ async function apiFetch(endpoint, options = {}) {
         credentials: 'include'
     };
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, config);
     const data = await response.json();
 
     if (!response.ok) {

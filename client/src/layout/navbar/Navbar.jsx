@@ -1,4 +1,4 @@
-import { AppBar, Box, IconButton, keyframes, Link, Toolbar } from "@mui/material";
+import { AppBar, Toolbar } from "@mui/material";
 import { useNavbar } from "../../hooks/useNavbar.js";
 
 import NavigationIcons from "./NavigationIcons.jsx";

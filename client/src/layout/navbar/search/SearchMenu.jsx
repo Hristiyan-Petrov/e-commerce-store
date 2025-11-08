@@ -5,12 +5,15 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { Link as RouterLink } from "react-router";
 import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll';
 import { hoverBackgroundFill } from '../../../styles/common';
+import { useEffect, useState } from 'react';
+import { fetchAll } from '../../../api/product';
+import { ROUTES } from "../../../constants/routes";
 
 const searchRelatedLinks = [
-    { label: 'Mice', to: '/shop/mice' },
-    { label: 'Keyboards', to: '/shop/keyboards' },
-    { label: 'Monitors', to: '/shop/monitors' },
-    { label: 'New Arivals', to: '/shop/new-arrivals' },
+    { label: 'Mice', to: ROUTES.PRODUCTS.CATEGORIES.MICE },
+    { label: 'Keyboards', to: ROUTES.PRODUCTS.CATEGORIES.KEYBOARDS, },
+    { label: 'Monitors', to: ROUTES.PRODUCTS.CATEGORIES.MONITORS, },
+    { label: 'New Arivals', to: ROUTES.PRODUCTS.NEW_ARRIVALS },
 ];
 
 export default function SearchMenu({
@@ -18,10 +21,29 @@ export default function SearchMenu({
     toggle,
     'aria-label': ariaLabel,
     'aria-hidden': ariaHidden,
-    products = [],
+    // products = [],
     ...props
 }) {
     useLockBodyScroll(open);
+
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        if (open) {
+
+            const loadProducts = () => fetchAll()
+                .then((data) => {
+                    setProducts(data);
+                    console.log(data)
+                }).catch(error => {
+                    console.log(error);
+                });
+
+            loadProducts();
+        }
+
+    }, [open]);
+
 
     const handleSearch = () => {
         console.log('You clicked search.');

@@ -8,6 +8,7 @@ import Layout from './layout/Layout.jsx';
 import LoginPage from './pages/Login.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
+import { ROUTES } from './constants/routes.js';
 
 const theme = createTheme({
     palette: {
@@ -97,7 +98,7 @@ function PrivateRoute({ children }) {
     if (loading) return null;
 
     if (user)
-        return <Navigate to='/login' replace={true} />
+        return <Navigate to={ROUTES.LOGIN} replace={true} />
 
     return children;
 };

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
 import cartApi from '../api/cart';
+import { localStorageOperations } from "../constants/storage";
 
 const GUEST_CART_KEY = 'guestCart';
 
@@ -26,28 +27,6 @@ export function CartProvider({ children }) {
     // GUEST CART FUNCTIONS (localStorage)
     // ============================================
 
-    const getGuestCartItems = useCallback(() => {
-        try {
-            const currentItems = localStorage.getItem(GUEST_CART_KEY);
-            return currentItems ? JSON.parse(currentItems) : [];
-        } catch (error) {
-            console.error('Failed to parse guest cart:', error);
-            return [];
-        }
-    }, []);
-
-    const saveGuestCartItems = useCallback((items) => {
-        try {
-            localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
-        } catch (error) {
-            console.error('Failed to save guest cart:', error);
-        }
-    }, []);
-
-    const clearGuestCart = useCallback(() => {
-        localStorage.removeItem(GUEST_CART_KEY);
-    }, []);
-
     const calculateGuestCartSummary = useCallback((cartItems) => {
         return cartItems.reduce((acc, curr) => ({
             itemCount: acc.itemCount + 1,
@@ -66,12 +45,12 @@ export function CartProvider({ children }) {
     }, []);
 
     const loadGuestCartItems = useCallback(() => {
-        const guestCartItems = getGuestCartItems();
+        const guestCartItems = localStorageOperations.getGuestCartItems();
         setCartItems(guestCartItems);
 
         const guestSummary = calculateGuestCartSummary(guestCartItems);
         setSummary(guestSummary);
-    }, [getGuestCartItems, calculateGuestCartSummary]);
+    }, [calculateGuestCartSummary]);
 
     // ============================================
     // SERVER CART FUNCTIONS (authenticated)
@@ -108,7 +87,7 @@ export function CartProvider({ children }) {
 
             setCartItems(response.cartItems);
             setSummary(response.summary);
-            clearGuestCart();
+            localStorageOperations.clearGuestCart();
         } catch (error) {
             console.error('Failed to merge cart:', error);
             setError(error.message);
@@ -116,14 +95,14 @@ export function CartProvider({ children }) {
         } finally {
             setIsMerging(false);
         }
-    }, [clearGuestCart, loadServerCartItems]);
+    }, [loadServerCartItems]);
 
     // Load cart when component mounts or user changes
     useEffect(() => {
         if (isMerging) return;
 
         if (user) {
-            const guestCartItems = getGuestCartItems();
+            const guestCartItems = localStorageOperations.getGuestCartItems();
             if (guestCartItems.length > 0) {
                 mergeGuestCart(guestCartItems);
             } else {
@@ -132,7 +111,7 @@ export function CartProvider({ children }) {
         } else {
             loadGuestCartItems();
         }
-    }, [user, isMerging, getGuestCartItems, mergeGuestCart, loadServerCartItems, loadGuestCartItems]);
+    }, [user, isMerging, mergeGuestCart, loadServerCartItems, loadGuestCartItems]);
 
     // ============================================
     // GUEST AND LOGGED IN FUNCTIONS
@@ -147,7 +126,7 @@ export function CartProvider({ children }) {
                 return response;
             } else {
                 // Guest user - add to localStorage
-                const guestCartItems = getGuestCartItems();
+                const guestCartItems = localStorageOperations.getGuestCartItems();
 
                 const existingIndex = guestCartItems.findIndex(x => x.productId === productId);
                 if (existingIndex !== -1) {
@@ -171,7 +150,7 @@ export function CartProvider({ children }) {
 
                 }
 
-                saveGuestCartItems(guestCartItems);
+                localStorageOperations.saveGuestCartItems(guestCartItems);
                 loadGuestCartItems();
                 return { success: true, message: 'Added to cart' };
             }
@@ -179,7 +158,7 @@ export function CartProvider({ children }) {
             console.error('Failed to add to cart:', error);
             throw error;
         }
-    }, [user, getGuestCartItems, saveGuestCartItems, loadGuestCartItems]);
+    }, [user, loadGuestCartItems]);
 
     const updateQuantity = useCallback(async (cartItemId, quantity) => {
         try {
@@ -195,12 +174,12 @@ export function CartProvider({ children }) {
                 setSummary(response.summary);
                 return response;
             } else {
-                const guestCartItems = getGuestCartItems();
+                const guestCartItems = localStorageOperations.getGuestCartItems();
                 const itemIndex = guestCartItems.findIndex(x => x.id === cartItemId);
                 if (itemIndex !== -1) {
                     guestCartItems[itemIndex].quantity = quantity;
                     guestCartItems[itemIndex].subtotal = guestCartItems[itemIndex].finalPrice * quantity;
-                    saveGuestCartItems(guestCartItems);
+                    localStorageOperations.saveGuestCartItems(guestCartItems);
                     loadGuestCartItems();
                 }
             }
@@ -208,7 +187,7 @@ export function CartProvider({ children }) {
             console.error('Failed to update quantity:', error);
             throw error;
         }
-    }, [user, getGuestCartItems, saveGuestCartItems, loadGuestCartItems]);
+    }, [user, loadGuestCartItems]);
 
     const incrementQuantity = useCallback(async (cartItemId) => {
         const item = cartItems.find(i => i.id === cartItemId);
@@ -234,16 +213,16 @@ export function CartProvider({ children }) {
 
                 return response;
             } else {
-                const guestCartItems = getGuestCartItems();
+                const guestCartItems = localStorageOperations.getGuestCartItems();
                 const filteredItems = guestCartItems.filter(item => item.id !== cartItemId);
-                saveGuestCartItems(filteredItems);
+                localStorageOperations.saveGuestCartItems(filteredItems);
                 loadGuestCartItems();
             }
         } catch (error) {
             console.error('Failed to remove from cart:', error);
             throw error;
         }
-    }, [user, getGuestCartItems, saveGuestCartItems, loadGuestCartItems]);
+    }, [user, loadGuestCartItems]);
 
     const refreshCart = useCallback(() => (
         user ? loadServerCartItems : loadGuestCartItems

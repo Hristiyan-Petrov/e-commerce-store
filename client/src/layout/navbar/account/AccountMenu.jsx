@@ -8,6 +8,7 @@ import TopDrawerMenu from '../../../components/common/TopDrawerMenu';
 import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
 import { useAuth } from "../../../context/AuthContext";
 import { hoverBackgroundFill } from "../../../styles/common";
+import { ROUTES } from "../../../constants/routes";
 
 const accountMenuItems = [
     { label: 'Profile', to: '/profile' },
@@ -127,7 +128,7 @@ export default function AccountMenu({
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <Button
                                 component={RouterLink}
-                                to="/login"
+                                to={ROUTES.LOGIN}
                                 variant="contained"
                                 onClick={() => toggle()}
                             >
@@ -135,7 +136,7 @@ export default function AccountMenu({
                             </Button>
                             <Button
                                 component={RouterLink}
-                                to="/register"
+                                to={ROUTES.REGISTER}
                                 variant="contained"
                                 color="secondary"
                                 onClick={() => toggle()}

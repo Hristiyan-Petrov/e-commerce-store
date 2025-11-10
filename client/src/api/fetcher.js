@@ -1,7 +1,5 @@
 import { API_CONFIG } from "../constants/api";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
 async function apiFetch(endpoint, options = {}) {
     const config = {
         ...options,

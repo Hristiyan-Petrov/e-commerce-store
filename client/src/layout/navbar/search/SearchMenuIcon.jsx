@@ -38,7 +38,7 @@ export default function SearchMenuIcon({
                     '& .MuiChip-icon': {
                         color: 'secondary.main'
                     },
-                    ...underlineHoverEffect(2.5),
+                    ...underlineHoverEffect(2.25),
                 }}
                 onClick={toggle}
                 icon={open ? <SearchOffIcon /> : <SearchOutlinedIcon />}

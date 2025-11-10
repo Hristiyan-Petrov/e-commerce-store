@@ -1,7 +1,9 @@
+// import { useTheme } from "@emotion/react";
 
 // const theme = useTheme();
 // export const screenQueries = {
 //     isSmallScreen: useMediaQuery(theme.breakpoints.down('md')),
+//     isDesktop: useMediaQuery(theme.breakpoints.up('sm')),
 
 // };
 

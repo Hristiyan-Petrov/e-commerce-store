@@ -2,6 +2,7 @@ import { Box, List, Typography } from "@mui/material";
 import CartItem from "./CartItem";
 import { useState } from "react";
 import { useCart } from "../../../../context/CartContext";
+import { AnimatePresence, motion } from 'motion/react';
 
 export default function CartItemList({
     items,
@@ -40,17 +41,19 @@ export default function CartItemList({
             </Typography>
 
             <List>
-                {items.map(item => (
-                    <CartItem
-                        key={item.id}
-                        item={item}
-                        toggle={toggle}
-                        isUpdating={updatingItems.has(item.id)}
-                        onIncrement={() => handleCartOperation(incrementQuantity, item.id)}
-                        onDecrement={() => handleCartOperation(decrementQuantity, item.id)}
-                        onRemove={() => handleCartOperation(removeFromCart, item.id)}
-                    />
-                ))}
+                <AnimatePresence>
+                    {items.map(item => (
+                        <CartItem
+                            key={item.id}
+                            item={item}
+                            toggle={toggle}
+                            isUpdating={updatingItems.has(item.id)}
+                            onIncrement={() => handleCartOperation(incrementQuantity, item.id)}
+                            onDecrement={() => handleCartOperation(decrementQuantity, item.id)}
+                            onRemove={() => handleCartOperation(removeFromCart, item.id)}
+                        />
+                    ))}
+                </AnimatePresence>
             </List>
         </Box>
     );

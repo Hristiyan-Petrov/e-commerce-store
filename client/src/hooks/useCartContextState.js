@@ -19,6 +19,8 @@ export function useCartContextState() {
 
     const { user } = useAuth();
 
+    const [isCartIconAnimating, setIsCartIconAnimating] = useState(false);
+
     // ============================================
     // GUEST CART FUNCTIONS (localStorage)
     // ============================================
@@ -122,6 +124,7 @@ export function useCartContextState() {
             if (user) {
                 const response = await cartApi.addToCart(productId, quantity);
                 await loadServerCartItems();
+                setIsCartIconAnimating(true);
                 return response;
             } else {
                 // Guest user - add to localStorage
@@ -151,6 +154,7 @@ export function useCartContextState() {
 
                 LOCAL_STORAGE_OPERATIONS.GUEST_CART.saveGuestCartItems(guestCartItems);
                 loadGuestCartItems();
+                setIsCartIconAnimating(true);
                 return { success: true, message: 'Added to cart' };
             }
         } catch (error) {
@@ -171,6 +175,7 @@ export function useCartContextState() {
                 );
 
                 setSummary(response.summary);
+                setIsCartIconAnimating(true);
                 return response;
             } else {
                 const guestCartItems = LOCAL_STORAGE_OPERATIONS.GUEST_CART.getGuestCartItems();
@@ -180,6 +185,7 @@ export function useCartContextState() {
                     guestCartItems[itemIndex].subtotal = guestCartItems[itemIndex].finalPrice * quantity;
                     LOCAL_STORAGE_OPERATIONS.GUEST_CART.saveGuestCartItems(guestCartItems);
                     loadGuestCartItems();
+                    setIsCartIconAnimating(true);
                 }
             }
         } catch (error) {
@@ -242,7 +248,9 @@ export function useCartContextState() {
             incrementQuantity,
             decrementQuantity,
             removeFromCart,
-            refreshCart
+            refreshCart,
+            isCartIconAnimating,
+            setIsCartIconAnimating,
         }
     ), [
         cartItems,
@@ -254,6 +262,8 @@ export function useCartContextState() {
         incrementQuantity,
         decrementQuantity,
         removeFromCart,
-        refreshCart
+        refreshCart,
+        isCartIconAnimating,
+        setIsCartIconAnimating,
     ]);
 };

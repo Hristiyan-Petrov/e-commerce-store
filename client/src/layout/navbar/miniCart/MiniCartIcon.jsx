@@ -3,6 +3,8 @@ import NavIcon from "../../../components/common/NavIcon";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useCart } from "../../../context/CartContext";
+import { useEffect } from "react";
+import { motion, useAnimation } from 'motion/react';
 
 export default function MiniCartIcon({
     open,
@@ -12,30 +14,46 @@ export default function MiniCartIcon({
     'aria-controls': ariaControls,
     ...props
 }) {
-    const { summary } = useCart();
+    const { summary, isCartIconAnimating, setIsCartIconAnimating } = useCart();
+    const controls = useAnimation();
+
+    useEffect(() => {
+        if (isCartIconAnimating) {
+            controls.start({
+                rotate: [0, 15, -15, 15, -15, 0],
+                transition: { duration: 0.4 }
+            });
+            setIsCartIconAnimating(false);
+        }
+
+    }, [isCartIconAnimating, controls, setIsCartIconAnimating]);
 
     return (
-        <NavIcon
-            toggle={toggle}
-            aria-label={ariaLabel}
-            aria-expanded={ariaExpanded}
-            aria-controls={ariaControls}
-            {...props}
+        <motion.div
+            animate={controls}
         >
-            <Badge
-                badgeContent={summary.totalQuantity}
-                color="primary"
-                sx={{
-                    '& .MuiBadge-badge': {
-                        left: 10
-                    }
-                }}
+            <NavIcon
+                toggle={toggle}
+                aria-label={ariaLabel}
+                aria-expanded={ariaExpanded}
+                aria-controls={ariaControls}
+                {...props}
             >
-                {open
-                    ? <ShoppingCartIcon />
-                    : <ShoppingCartOutlinedIcon />
-                }
-            </Badge>
-        </NavIcon>
+                <Badge
+                    badgeContent={summary.totalQuantity}
+                    color="primary"
+                    sx={{
+                        '& .MuiBadge-badge': {
+                            left: 10
+                        }
+                    }}
+                >
+                    {open
+                        ? <ShoppingCartIcon />
+                        : <ShoppingCartOutlinedIcon />
+                    }
+                </Badge>
+            </NavIcon>
+        </motion.div>
     );
 };

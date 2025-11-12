@@ -15,6 +15,10 @@ import {
 } from '@mui/material';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+// import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+
+
 import { useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -54,6 +58,8 @@ const ProductCard = ({ product }) => {
         e.stopPropagation();
         e.preventDefault();
 
+        if (isAdding) return;
+
         setIsAdding(true);
         setShowError(false);
 
@@ -74,6 +80,18 @@ const ProductCard = ({ product }) => {
     const responsiveAnchor = isDesktop
         ? { vertical: 'bottom', horizontal: 'right' }
         : { vertical: 'bottom', horizontal: 'center' };
+
+    const iconVariants = {
+        hidden: { opacity: 0, scale: 0.5 },
+        visible: { opacity: 1, scale: 1 },
+        exit: { opacity: 0, scale: 0.5, y: -10 }
+    };
+
+    const centeringStyles = {
+        display: 'flex',
+        // justifyContent: 'center',
+        // alignItems: 'center',
+    };
 
     return (
         <>
@@ -138,27 +156,71 @@ const ProductCard = ({ product }) => {
                             )}
                         </Box>
 
-                        <IconButton
-                            onClick={handleAddToCart}
-                            disabled={isAdding}
-                            sx={{
-                                backgroundColor: 'secondary.light',
-                                '&:hover': {
-                                    backgroundColor: 'primary.light',
-                                },
-                                '&.Mui-disabled': {
-                                    backgroundColor: 'action.disabledBackground',
-                                },
-                            }}
+                        <motion.div
+                            whileHover={{ scale: 1.2 }}
+                            whileTap={{ scale: 0.8 }}
                         >
-                            {isAdding ? (
-                                <CircularProgress size={24} />
-                            ) : showSuccess ? (
-                                <CheckCircleIcon color="success" />
-                            ) : (
-                                <AddShoppingCartRoundedIcon />
-                            )}
-                        </IconButton>
+                            <IconButton
+                                onClick={handleAddToCart}
+                                disabled={isAdding}
+                                sx={{
+                                    backgroundColor: 'secondary.light',
+                                    width: 40,
+                                    height: 40,
+                                    '&:hover': {
+                                        backgroundColor: 'primary.light',
+                                    },
+                                    '&.Mui-disabled': {
+                                        backgroundColor: 'action.disabledBackground',
+                                    },
+                                }}
+                            >
+                                <AnimatePresence mode="wait" initial={false}>
+                                    {isAdding ? (
+                                        <motion.div
+                                            key="loader"
+                                            style={centeringStyles}
+                                            variants={iconVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            exit="hidden"
+                                        >
+                                            <CircularProgress size={24} />
+                                        </motion.div>
+                                    ) : showSuccess ? (
+                                        <motion.div
+                                            key="success"
+                                            style={centeringStyles}
+                                            variants={iconVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            exit="hidden"
+                                        >
+                                            <CheckCircleIcon color="success" />
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="cart"
+                                            style={centeringStyles}
+                                            variants={iconVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            exit="hidden"
+                                        >
+                                            <AddShoppingCartRoundedIcon />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* {isAdding ? (
+                                    <CircularProgress size={24} />
+                                ) : showSuccess ? (
+                                    <CheckCircleIcon color="success" />
+                                ) : (
+                                    <AddShoppingCartRoundedIcon />
+                                )} */}
+                            </IconButton>
+                        </motion.div>
                     </Stack>
                 </CardContent>
             </Card>

@@ -23,6 +23,8 @@ import { useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
+import { pushToDataLayer } from '../../utils/dataLayer';
+import { ANALYTICS_EVENTS } from '../../constants/analytics';
 
 const ProductCard = ({ product }) => {
     const [isAdding, setIsAdding] = useState(false);
@@ -62,10 +64,24 @@ const ProductCard = ({ product }) => {
 
         setIsAdding(true);
         setShowError(false);
-
         try {
             await addToCart(id, 1, product);
             setShowSuccess(true);
+
+            const event = user ? ANALYTICS_EVENTS.CART.GUEST_ADD_ITEM : ANALYTICS_EVENTS.CART.LOGGED_ADD_ITEM; 
+            // Track event
+            pushToDataLayer(event, {
+                ecommerce: {
+                    currency: 'USD',
+                    value: displaySalePrice ? displaySalePrice : price,
+                    items: [{
+                        item_id: id,
+                        item_name: name,
+                        price: displaySalePrice ? displaySalePrice : price,
+                        quantity: 1
+                    }]
+                }
+            });
         } catch (error) {
             console.error('Failed to add to cart:', error);
             setErrorMessage(error.message || 'Failed to add item to cart');

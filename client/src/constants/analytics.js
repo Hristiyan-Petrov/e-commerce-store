@@ -13,16 +13,20 @@ export const ANALYTICS_EVENTS = {
 
     // Cart Events
     CART: {
-        ITEM_ADDED: 'cart_item_added',
-        ITEM_REMOVED: 'cart_item_removed',
+        // Logged in Users Specific
+        LOGGED_ADD_ITEM: 'logged_in_add_to_cart',
+        
+        // Guest Cart Specific
+        GUEST_ADD_ITEM: 'guest_add_to_cart',
+        GUEST_CART_ABANDONED: 'guest_cart_abandoned',
+        GUEST_CART_MERGED: 'guest_cart_merged',
+        
+        // Not Specific
+        REMOVE_ITEM: 'remove_from_cart',
         QUANTITY_UPDATED: 'cart_quantity_updated',
         CART_VIEWED: 'cart_viewed',
         CART_CLEARED: 'cart_cleared',
-
-        // Guest Cart Specific
-        GUEST_ITEM_ADDED: 'guest_cart_item_added',
-        GUEST_CART_ABANDONED: 'guest_cart_abandoned',
-        GUEST_CART_MERGED: 'guest_cart_merged',
+        
     },
 
     // Product Events

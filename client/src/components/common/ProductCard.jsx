@@ -68,17 +68,18 @@ const ProductCard = ({ product }) => {
             await addToCart(id, 1, product);
             setShowSuccess(true);
 
-            const event = user ? ANALYTICS_EVENTS.CART.GUEST_ADD_ITEM : ANALYTICS_EVENTS.CART.LOGGED_ADD_ITEM; 
             // Track event
-            pushToDataLayer(event, {
+            pushToDataLayer(ANALYTICS_EVENTS.CART.ADD_TO_CART, {
+                user_status: user ? 'logged_in' : 'guest',
                 ecommerce: {
                     currency: 'USD',
-                    value: displaySalePrice ? displaySalePrice : price,
+                    value: hasSale ? displaySalePrice : displayPrice,
                     items: [{
-                        item_id: id,
+                        item_id: String(id),
                         item_name: name,
-                        price: displaySalePrice ? displaySalePrice : price,
-                        quantity: 1
+                        price: hasSale ? displaySalePrice : displayPrice,
+                        quantity: 1,
+                        discount: hasSale ? displayPrice - displaySalePrice : 0
                     }]
                 }
             });

@@ -5,6 +5,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useCart } from "../../../context/CartContext";
 import { useEffect } from "react";
 import { motion, useAnimation } from 'motion/react';
+import IconPopTransition from "../../../components/common/IconPopTransition";
 
 export default function MiniCartIcon({
     open,
@@ -48,10 +49,9 @@ export default function MiniCartIcon({
                         }
                     }}
                 >
-                    {open
-                        ? <ShoppingCartIcon />
-                        : <ShoppingCartOutlinedIcon />
-                    }
+                    
+                    <IconPopTransition condition={open} defaultIcon={<ShoppingCartOutlinedIcon/>} alternateIcon={<ShoppingCartIcon/>} />
+                
                 </Badge>
             </NavIcon>
         </motion.div>

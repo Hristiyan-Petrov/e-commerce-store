@@ -14,7 +14,6 @@ import {
     useTheme,
 } from '@mui/material';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // import { motion } from 'motion/react';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -25,6 +24,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { pushToDataLayer } from '../../utils/dataLayer';
 import { ANALYTICS_EVENTS } from '../../constants/analytics';
+import IconPopTransition from './IconPopTransition';
 
 const ProductCard = ({ product }) => {
     const [isAdding, setIsAdding] = useState(false);
@@ -101,7 +101,6 @@ const ProductCard = ({ product }) => {
     const iconVariants = {
         hidden: { opacity: 0, scale: 0.5 },
         visible: { opacity: 1, scale: 1 },
-        exit: { opacity: 0, scale: 0.5, y: -10 }
     };
 
     const centeringStyles = {
@@ -174,12 +173,13 @@ const ProductCard = ({ product }) => {
                         </Box>
 
                         <motion.div
-                            whileHover={{ scale: 1.2 }}
-                            whileTap={{ scale: 0.8 }}
+                            whileHover={isAdding ? {} : { scale: 1.2 }}
+                            whileTap={isAdding ? {} : { scale: 0.8 }}
                         >
                             <IconButton
                                 onClick={handleAddToCart}
                                 disabled={isAdding}
+                                disableRipple
                                 sx={{
                                     backgroundColor: 'secondary.light',
                                     width: 40,
@@ -192,7 +192,8 @@ const ProductCard = ({ product }) => {
                                     },
                                 }}
                             >
-                                <AnimatePresence mode="wait" initial={false}>
+                                <IconPopTransition condition={isAdding} defaultIcon={<AddShoppingCartRoundedIcon />} alternateIcon={<CircularProgress />} />
+                                {/* <AnimatePresence mode="wait" initial={false}>
                                     {isAdding ? (
                                         <motion.div
                                             key="loader"
@@ -204,18 +205,7 @@ const ProductCard = ({ product }) => {
                                         >
                                             <CircularProgress size={24} />
                                         </motion.div>
-                                    ) : showSuccess ? (
-                                        <motion.div
-                                            key="success"
-                                            style={centeringStyles}
-                                            variants={iconVariants}
-                                            initial="hidden"
-                                            animate="visible"
-                                            exit="hidden"
-                                        >
-                                            <CheckCircleIcon color="success" />
-                                        </motion.div>
-                                    ) : (
+                                    ): (
                                         <motion.div
                                             key="cart"
                                             style={centeringStyles}
@@ -227,7 +217,7 @@ const ProductCard = ({ product }) => {
                                             <AddShoppingCartRoundedIcon />
                                         </motion.div>
                                     )}
-                                </AnimatePresence>
+                                </AnimatePresence> */}
 
                                 {/* {isAdding ? (
                                     <CircularProgress size={24} />

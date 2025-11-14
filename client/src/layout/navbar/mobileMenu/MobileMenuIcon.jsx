@@ -4,6 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import NavIcon from "../../../components/common/NavIcon";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { SHOW_MOBILE_ONLY } from "../../../constants/breakpoints";
+import IconPopTransition from "../../../components/common/IconPopTransition";
 
 export default function MobileMenuIcon({
     open,
@@ -22,7 +23,8 @@ export default function MobileMenuIcon({
             {...props}
         >
 
-            <Box sx={{
+            <IconPopTransition condition={open} defaultIcon={<MenuIcon />} alternateIcon={<CloseRoundedIcon />} />
+            {/* <Box sx={{
                 width: 24,
                 height: 24,
             }}>
@@ -39,7 +41,7 @@ export default function MobileMenuIcon({
                     transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
                     opacity: open ? 1 : 0,
                 }} />
-            </Box>
+            </Box> */}
         </NavIcon>
     );
 };

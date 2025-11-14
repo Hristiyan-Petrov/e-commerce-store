@@ -2,8 +2,8 @@ import NavIcon from "../../../components/common/NavIcon";
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { SHOW_MD_DOWN, SHOW_MD_UP } from "../../../constants/breakpoints";
-import { underlineHoverEffect } from "../../../styles/common";
 import { Chip } from "@mui/material";
+import IconPopTransition from "../../../components/common/IconPopTransition";
 
 export default function SearchMenuIcon({
     open,
@@ -22,13 +22,7 @@ export default function SearchMenuIcon({
                 aria-controls={ariaControls}
                 {...props}
             >
-                {
-                    open
-                        ? <SearchOffIcon />
-                        : <SearchOutlinedIcon />
-                }
-
-
+                <IconPopTransition condition={open} defaultIcon={<SearchOutlinedIcon/>} alternateIcon={<SearchOffIcon/>} />
             </NavIcon >
 
             <Chip
@@ -38,10 +32,9 @@ export default function SearchMenuIcon({
                     '& .MuiChip-icon': {
                         color: 'secondary.main'
                     },
-                    ...underlineHoverEffect(2.25),
                 }}
                 onClick={toggle}
-                icon={open ? <SearchOffIcon /> : <SearchOutlinedIcon />}
+                icon={<IconPopTransition condition={open} defaultIcon={<SearchOutlinedIcon/>} alternateIcon={<SearchOffIcon/>} />}
             />
         </>
 

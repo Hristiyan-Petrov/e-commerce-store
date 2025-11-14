@@ -1,18 +1,24 @@
-import { IconButton } from "@mui/material";
-import { underlineHoverEffect } from "../../styles/common";
+import { alpha, IconButton, useTheme } from "@mui/material";
 
 export default function NavIcon({
     toggle,
     sx = {},
     children
 }) {
+    const theme = useTheme();
+
     return (
         <IconButton
             onClick={toggle}
             disableRipple
             aria-label="account icon"
             sx={{
-                ...underlineHoverEffect(2.5),
+                transition: 'background-color 150ms',
+                '@media (hover: hover)': {
+                    '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                    },
+                },
                 ...sx
             }}
         >

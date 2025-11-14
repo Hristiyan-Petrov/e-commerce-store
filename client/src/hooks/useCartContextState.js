@@ -124,6 +124,7 @@ export function useCartContextState() {
             if (user) {
                 const response = await cartApi.addToCart(productId, quantity);
                 await loadServerCartItems();
+                window.dispatchEvent(new CustomEvent('showNavbar'));
                 setIsCartIconAnimating(true);
                 return response;
             } else {

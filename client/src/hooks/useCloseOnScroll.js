@@ -6,9 +6,6 @@ export function useCloseOnScroll(open, toggle) {
 
         const handleScroll = toggle;
         window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        }
+        return () => window.removeEventListener('scroll', handleScroll);
     }, [open, toggle]);
 };

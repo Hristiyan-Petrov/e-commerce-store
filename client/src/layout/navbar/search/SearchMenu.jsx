@@ -91,6 +91,7 @@ export default function SearchMenu({
                         <CancelOutlinedIcon
                             onClick={toggle}
                             aria-label="Close search menu"
+                            sx={{ cursor: 'pointer' }}
                         />
                     </Box>
 

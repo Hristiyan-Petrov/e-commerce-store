@@ -44,7 +44,6 @@ export default function MiniCartMenu({
                     // maxHeight: 'calc(100vh - 56px)',
                     overflowY: 'auto',
                     height: 'calc(100vh - 56px)',
-                    // 2. USE FLEXBOX TO DISTRIBUTE SPACE
                     display: 'flex',
                     flexDirection: 'column',
                 }}

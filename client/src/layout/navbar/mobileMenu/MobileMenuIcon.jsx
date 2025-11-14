@@ -24,6 +24,8 @@ export default function MobileMenuIcon({
         >
 
             <IconPopTransition condition={open} defaultIcon={<MenuIcon />} alternateIcon={<CloseRoundedIcon />} />
+            
+            {/* Rotating animation */}
             {/* <Box sx={{
                 width: 24,
                 height: 24,

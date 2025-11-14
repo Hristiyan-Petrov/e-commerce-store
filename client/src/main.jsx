@@ -24,18 +24,6 @@ const theme = createTheme({
             // dark: '#494A4B',
             // contrastText: '#fff',
         },
-        // primary: {
-        //     main: '#0F3A7D',      // Deep tech blue
-        //     light: '#4A6FA5',
-        //     dark: '#051F3E',
-        //     contrastText: '#fff',
-        // },
-        // secondary: {
-        //     main: '#FF9500',      // Warm orange
-        //     light: '#FFB84D',
-        //     dark: '#CC7700',
-        //     contrastText: '#fff',
-        // },
         success: {
             main: '#4CAF50',
         },

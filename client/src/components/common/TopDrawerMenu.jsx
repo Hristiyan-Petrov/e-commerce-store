@@ -3,6 +3,7 @@ import { Drawer } from "@mui/material";
 const TopDrawerMenu = ({
     open,
     sx = {},
+    paperSx = {},
     children,
     'aria-label': ariaLabel,
     'aria-hidden': ariaHidden,
@@ -24,13 +25,13 @@ const TopDrawerMenu = ({
                 position: "absolute",
                 width: '100%',
                 ...sx
-                
             }}
             PaperProps={{
                 sx: {
                     position: 'relative',
                     borderTop: '5px solid',
                     borderTopColor: 'primary.main',
+                    ...paperSx
                 }
             }}
             {...props}

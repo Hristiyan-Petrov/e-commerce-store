@@ -49,10 +49,13 @@ export default function AccountMenu({
             open={open}
             sx={{
                 width: { xs: '100%', sm: '50%', md: '30%', lg: '25%' },
-                right: { sm: 0, xl: '15%' }
+                right: { sm: 0, xl: '15%' },
             }}
             aria-label={ariaLabel}
             aria-hidden={ariaHidden}
+            paperSx={{
+                borderRadius: '0 0 8px 8px' 
+            }}
             {...props}
         >
 

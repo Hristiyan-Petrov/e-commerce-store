@@ -14,13 +14,15 @@ import { Facebook, GitHub } from '@mui/icons-material';
 import GoogleIcon from '../components/common/GoogleIcon';
 import { underlineHoverEffect } from '../styles/common';
 import { useCart } from '../context/CartContext';
+import { API_CONFIG, API_ENDPOINTS } from '../constants/api';
 
 const LoginPage = () => {
     const { summary, isMerging } = useCart();
 
     const handleGoogleLogin = () => {
         const API_URL = import.meta.env.VITE_API_URL;
-        window.location.href = `${API_URL}/auth/google`;
+        console.log(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`);
+        window.location.href = `${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`;
     };
 
     return (

@@ -46,13 +46,13 @@ export default function CartSummary({
                                 ${summary.totalSavings.toFixed(2)}
                             </Typography>
                         </Box>
-                        <Divider sx={{ mt: 3 }} />
+                        <Divider sx={{ my: 3 }} />
                     </>
                 )}
 
                 <Box
                     sx={{
-                        mt: 3,
+                        // mt: 3,
                         display: 'flex',
                         justifyContent: 'space-between',
                     }}

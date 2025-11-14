@@ -12,12 +12,10 @@ import {
     Alert,
     useMediaQuery,
     useTheme,
+    Button,
 } from '@mui/material';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
-// import { motion } from 'motion/react';
-import { AnimatePresence, motion } from 'motion/react';
-
-
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -68,6 +66,8 @@ const ProductCard = ({ product }) => {
             await addToCart(id, 1, product);
             setShowSuccess(true);
 
+            window.dispatchEvent(new CustomEvent('showNavbar'));
+
             // Track event
             pushToDataLayer(ANALYTICS_EVENTS.CART.ADD_TO_CART, {
                 user_status: user ? 'logged_in' : 'guest',
@@ -97,17 +97,6 @@ const ProductCard = ({ product }) => {
     const responsiveAnchor = isDesktop
         ? { vertical: 'bottom', horizontal: 'right' }
         : { vertical: 'bottom', horizontal: 'center' };
-
-    const iconVariants = {
-        hidden: { opacity: 0, scale: 0.5 },
-        visible: { opacity: 1, scale: 1 },
-    };
-
-    const centeringStyles = {
-        display: 'flex',
-        // justifyContent: 'center',
-        // alignItems: 'center',
-    };
 
     return (
         <>
@@ -193,39 +182,6 @@ const ProductCard = ({ product }) => {
                                 }}
                             >
                                 <IconPopTransition condition={isAdding} defaultIcon={<AddShoppingCartRoundedIcon />} alternateIcon={<CircularProgress />} />
-                                {/* <AnimatePresence mode="wait" initial={false}>
-                                    {isAdding ? (
-                                        <motion.div
-                                            key="loader"
-                                            style={centeringStyles}
-                                            variants={iconVariants}
-                                            initial="hidden"
-                                            animate="visible"
-                                            exit="hidden"
-                                        >
-                                            <CircularProgress size={24} />
-                                        </motion.div>
-                                    ): (
-                                        <motion.div
-                                            key="cart"
-                                            style={centeringStyles}
-                                            variants={iconVariants}
-                                            initial="hidden"
-                                            animate="visible"
-                                            exit="hidden"
-                                        >
-                                            <AddShoppingCartRoundedIcon />
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence> */}
-
-                                {/* {isAdding ? (
-                                    <CircularProgress size={24} />
-                                ) : showSuccess ? (
-                                    <CheckCircleIcon color="success" />
-                                ) : (
-                                    <AddShoppingCartRoundedIcon />
-                                )} */}
                             </IconButton>
                         </motion.div>
                     </Stack>
@@ -235,18 +191,36 @@ const ProductCard = ({ product }) => {
             {/* Snackbars */}
             <Snackbar
                 open={showSuccess}
-                autoHideDuration={2000}
+                autoHideDuration={4000}
                 onClose={() => setShowSuccess(false)}
                 anchorOrigin={responsiveAnchor}
             >
                 <Alert
                     onClose={() => setShowSuccess(false)}
                     severity="success"
-                    variant="filled"
+                    // variant="filled"
+                    //     onClick={() => {
+                    //         setShowSuccess(false);
+                    //         window.dispatchEvent(new CustomEvent('openMiniCart'));
+                    //     }}
+                    // >
+                    //     Added to cart.
+                    action={
+                        <Button
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setShowSuccess(false);
+                                window.dispatchEvent(new CustomEvent('openMiniCart'));
+                            }}
+                        >
+                            VIEW CART
+                        </Button>
+                    }
                 >
                     Added to cart!
                 </Alert>
-            </Snackbar>
+            </Snackbar >
 
             <Snackbar
                 open={showError}

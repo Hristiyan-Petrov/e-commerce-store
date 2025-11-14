@@ -16,6 +16,9 @@ module.exports = new EntitySchema({
         description: {
             type: 'text'
         },
+        // category : {
+        //     type: "varchar"
+        // },
         price: {
             type: 'decimal',
             precision: 10,

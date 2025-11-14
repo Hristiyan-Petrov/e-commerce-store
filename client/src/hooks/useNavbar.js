@@ -16,9 +16,16 @@ export function useNavbar() {
             }
         };
 
-            document.addEventListener('keydown', handleEscape);
-            return () => document.removeEventListener('keydown', handleEscape)
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape)
     }, [activeMenu]);
+
+    // Custom event for mini cart opening
+    useEffect(() => {
+        const handler = () => toggleMenu('miniCart');
+        window.addEventListener('openMiniCart', handler);
+        return () => window.removeEventListener('openMiniCart', handler);
+    }, [toggleMenu]);
 
     return {
         activeMenu,

@@ -66,6 +66,8 @@ const ProductCard = ({ product }) => {
             await addToCart(id, 1, product);
             setShowSuccess(true);
 
+            window.dispatchEvent(new CustomEvent('showNavbar'));
+
             // Track event
             pushToDataLayer(ANALYTICS_EVENTS.CART.ADD_TO_CART, {
                 user_status: user ? 'logged_in' : 'guest',

@@ -4,11 +4,9 @@ export function useLockBodyScroll(isLocked) {
     useEffect(() => {
         if (!isLocked) return;
 
-        // Store original values
         const originalOverflow = document.body.style.overflow;
         const originalPaddingRight = document.body.style.paddingRight;
 
-        // Get scrollbar width to prevent layout shift
         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
         // Lock body scroll

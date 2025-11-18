@@ -1,14 +1,36 @@
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, TextField, Typography } from "@mui/material";
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { motion, AnimatePresence } from "motion/react";
+import { useEffect, useState } from "react";
 
 export default function QuantityStepper({
     item,
     isUpdating,
-    onDecrement,
-    onIncrement,
+    onQuantityUpdate
 }) {
+    const [inputValue, setInputValue] = useState(item.quantity);
+    useEffect(() => {
+        setInputValue(item.quantity);
+    }, [item.quantity]);
+
+    const handleBlur = () => {
+        const newQuantity = parseInt(inputValue, 10);
+
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            setInputValue(item.quantity);
+        } else if (newQuantity !== item.quantity) {
+            onQuantityUpdate(newQuantity);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleBlur();
+            e.target.blur();
+        }
+    };
+
     const popAnimation = {
         variants: {
             hidden: {
@@ -33,14 +55,14 @@ export default function QuantityStepper({
                 borderColor: 'secondary.light',
                 borderStyle: 'solid',
                 borderWidth: 2,
-                px: 1,
+                // px: 0,
                 display: 'flex',
                 alignItems: 'center',
             }}
         >
             <IconButton
                 size="small"
-                onClick={onDecrement}
+                onClick={() => onQuantityUpdate(item.quantity - 1)}
                 disabled={isUpdating || item.quantity <= 1}
             >
                 <RemoveOutlinedIcon fontSize="small" />
@@ -59,16 +81,38 @@ export default function QuantityStepper({
                     exit="hidden"
                     transition={popAnimation.transition}
                 >
-
-                    <Typography variant="subtitle1">
-                        {item.quantity}
-                    </Typography>
+                    <TextField
+                        type="number"
+                        variant="standard"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onBlur={handleBlur}
+                        onKeyDown={handleKeyDown}
+                        disabled={isUpdating}
+                        sx={{
+                            width: '3ch', // Adjusted width for a snug fit
+                            // Remove default number input arrows
+                            '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                '-webkit-appearance': 'none',
+                                margin: 0,
+                            },
+                            '& input[type=number]': {
+                                '-moz-appearance': 'textfield',
+                            },
+                            '& .MuiInputBase-input': {
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                padding: '4px 0', // Adjusted padding
+                            },
+                        }}
+                        InputProps={{ disableUnderline: true }}
+                    />
                 </motion.div>
             </AnimatePresence>
 
             <IconButton
                 size="small"
-                onClick={onIncrement}
+                onClick={() => onQuantityUpdate(item.quantity + 1)}
                 disabled={isUpdating}
             >
                 <AddOutlinedIcon fontSize="small" />

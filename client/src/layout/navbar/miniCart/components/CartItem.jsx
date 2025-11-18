@@ -22,9 +22,8 @@ function CartItem({
     item,
     toggle,
     isUpdating,
-    onIncrement,
-    onDecrement,
-    onRemove
+    onRemove,
+    onQuantityUpdate
 }) {
     const isOnSale = item.product.salePrice && item.product.salePrice < item.product.price;
 
@@ -140,8 +139,7 @@ function CartItem({
                     <QuantityStepper
                         item={item}
                         isUpdating={isUpdating}
-                        onDecrement={onDecrement}
-                        onIncrement={onIncrement}
+                        onQuantityUpdate={onQuantityUpdate}
                     />
 
                     {/* Item Subtotal */}

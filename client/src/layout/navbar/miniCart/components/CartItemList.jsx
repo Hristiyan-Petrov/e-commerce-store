@@ -9,12 +9,12 @@ export default function CartItemList({
     toggle
 }) {
     const [updatingItems, setUpdatingItems] = useState(new Set());
-    const { incrementQuantity, decrementQuantity, removeFromCart } = useCart();
+    const { removeFromCart, updateQuantity } = useCart();
 
-    const handleCartOperation = async (operation, cartItemId) => {
+    const handleCartOperation = async (operation, cartItemId, ...args) => {
         setUpdatingItems(prev => new Set(prev).add(cartItemId));
         try {
-            await operation(cartItemId);
+            await operation(cartItemId, ...args);
         } finally {
             setUpdatingItems(prev => {
                 const next = new Set(prev);
@@ -48,9 +48,8 @@ export default function CartItemList({
                             item={item}
                             toggle={toggle}
                             isUpdating={updatingItems.has(item.id)}
-                            onIncrement={() => handleCartOperation(incrementQuantity, item.id)}
-                            onDecrement={() => handleCartOperation(decrementQuantity, item.id)}
                             onRemove={() => handleCartOperation(removeFromCart, item.id)}
+                            onQuantityUpdate={(newQuantity) => handleCartOperation(updateQuantity, item.id, newQuantity)}
                         />
                     ))}
                 </AnimatePresence>

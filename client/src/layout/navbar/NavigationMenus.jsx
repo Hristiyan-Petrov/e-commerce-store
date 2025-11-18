@@ -16,6 +16,8 @@ export default function NavigationMenus({
                 height: 'calc(100vh - 56px)', // 56px is the default Toolbar height on mobile - only place where the mobile menu is visible
                 overflow: 'hidden',
                 pointerEvents: activeMenu ? 'auto' : 'none',
+                width: { xs: '100%', md: 'auto' },
+                background: 'transparent'
             }}
             role='region'
             aria-label='Navigation menus'

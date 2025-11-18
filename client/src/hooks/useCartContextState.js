@@ -165,6 +165,12 @@ export function useCartContextState() {
     }, [user, loadGuestCartItems]);
 
     const updateQuantity = useCallback(async (cartItemId, quantity) => {
+        quantity = parseInt(quantity, 10);
+
+        if (isNaN(quantity) || quantity < 1) {
+            return;
+        }
+
         try {
             if (user) {
                 const response = await cartApi.updateItemQuantity(cartItemId, quantity);
@@ -176,7 +182,6 @@ export function useCartContextState() {
                 );
 
                 setSummary(response.summary);
-                setIsCartIconAnimating(true);
                 return response;
             } else {
                 const guestCartItems = LOCAL_STORAGE_OPERATIONS.GUEST_CART.getGuestCartItems();
@@ -186,28 +191,29 @@ export function useCartContextState() {
                     guestCartItems[itemIndex].subtotal = guestCartItems[itemIndex].finalPrice * quantity;
                     LOCAL_STORAGE_OPERATIONS.GUEST_CART.saveGuestCartItems(guestCartItems);
                     loadGuestCartItems();
-                    setIsCartIconAnimating(true);
                 }
             }
+
+            setIsCartIconAnimating(true);
         } catch (error) {
             console.error('Failed to update quantity:', error);
             throw error;
         }
     }, [user, loadGuestCartItems]);
 
-    const incrementQuantity = useCallback(async (cartItemId) => {
-        const item = cartItems.find(i => i.id === cartItemId);
-        if (item) {
-            await updateQuantity(cartItemId, item.quantity + 1);
-        }
-    }, [cartItems, updateQuantity]);
+    // const incrementQuantity = useCallback(async (cartItemId) => {
+    //     const item = cartItems.find(i => i.id === cartItemId);
+    //     if (item) {
+    //         await updateQuantity(cartItemId, item.quantity + 1);
+    //     }
+    // }, [cartItems, updateQuantity]);
 
-    const decrementQuantity = useCallback(async (cartItemId) => {
-        const item = cartItems.find(i => i.id === cartItemId);
-        if (item && item.quantity > 1) {
-            await updateQuantity(cartItemId, item.quantity - 1);
-        }
-    }, [cartItems, updateQuantity]);
+    // const decrementQuantity = useCallback(async (cartItemId) => {
+    //     const item = cartItems.find(i => i.id === cartItemId);
+    //     if (item && item.quantity > 1) {
+    //         await updateQuantity(cartItemId, item.quantity - 1);
+    //     }
+    // }, [cartItems, updateQuantity]);
 
     const removeFromCart = useCallback(async (cartItemId) => {
         try {
@@ -246,8 +252,7 @@ export function useCartContextState() {
             isMerging,
             isGuest: !user,
             addToCart,
-            incrementQuantity,
-            decrementQuantity,
+            updateQuantity,
             removeFromCart,
             refreshCart,
             isCartIconAnimating,
@@ -260,8 +265,7 @@ export function useCartContextState() {
         error,
         isMerging,
         addToCart,
-        incrementQuantity,
-        decrementQuantity,
+        updateQuantity,
         removeFromCart,
         refreshCart,
         isCartIconAnimating,

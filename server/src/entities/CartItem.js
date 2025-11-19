@@ -37,18 +37,17 @@ module.exports = new EntitySchema({
     relations: {
         user: {
             type: 'many-to-one',
-            target: 'User',
+            target: ENTITY_NAMES.USER,
             joinColumn: { name: 'user_id' },
             onDelete: 'CASCADE'
         },
         product: {
             type: 'many-to-one',
-            target: 'Product',
+            target: ENTITY_NAMES.PRODUCT,
             joinColumn: { name: 'product_id' },
         }
     },
-    // User can't have duplicate products in cart
-    uniques: [
+    uniques: [ // User can't have duplicate products in cart
         {
             name: 'unique_user_product',
             columns: ['userId', 'productId']

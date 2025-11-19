@@ -6,6 +6,8 @@ export const API_ENDPOINTS = {
         ME: '/api/auth/me',
         GOOGLE: '/api/auth/google',
         GOOGLE_CALLBACK: '/api/auth/google/callback',
+        GITHUB: '/api/auth/github',
+        GITHUB_CALLBACK: '/api/auth/github/callback',
     },
 
     CART: {

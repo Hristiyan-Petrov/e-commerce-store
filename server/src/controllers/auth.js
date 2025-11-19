@@ -9,8 +9,8 @@ function setTokenCookie(res, token) {
     });
 };
 
-const handleGoogleCallback = (req, res) => {
-    console.log('SUCCESSFULL GOOGLE LOGIN');
+const handleOAuthCallback = (req, res) => {
+    console.log('SUCCESSFULL OAUTH LOGIN');
     console.log(req.user);
 
     // req.user contains the user object from passport strategy
@@ -18,7 +18,7 @@ const handleGoogleCallback = (req, res) => {
     setTokenCookie(res, token);
 
     // Redirect to frontend homepage 
-    res.redirect(`${process.env.CLIENT_URL}/`);
+    res.redirect(`${process.env.CLIENT_URL}`);
 };
 
 const getCurrentUser = async (req, res) => {
@@ -52,13 +52,13 @@ const getCurrentUser = async (req, res) => {
 
 const logout = (req, res) => {
     console.log('Logout from server');
-    
+
     res.clearCookie('token');
     res.json({ message: 'Loggout out successfully' });
 };
 
 module.exports = {
-    handleGoogleCallback,
+    handleOAuthCallback,
     getCurrentUser,
     logout
 };

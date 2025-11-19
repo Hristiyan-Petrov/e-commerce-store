@@ -1,5 +1,5 @@
 const { EntitySchema } = require("typeorm");
-const { ENTITY_NAMES } = require("../utils/constants");
+const { ENTITY_NAMES, ENTITY_ENUMS } = require("../utils/constants");
 
 module.exports = new EntitySchema({
     name: ENTITY_NAMES.USER,
@@ -18,13 +18,7 @@ module.exports = new EntitySchema({
         passwordHash: {
             name: 'password_hash',
             type: 'varchar',
-            nullable: true, // NULL for OAuth-only users
-        },
-        googleId: {
-            name: 'google_id',
-            type: 'varchar',
-            unique: true,
-            nullable: true,
+            nullable: true, // NULL for OAuth users
         },
         name: {
             type: 'varchar',
@@ -39,6 +33,16 @@ module.exports = new EntitySchema({
             type: "varchar",
             nullable: true
         },
+        role: {
+            type: 'enum',
+            enum: ENTITY_ENUMS.USER.ROLE,
+            default: 'customer'
+        },
+        status: {
+            type: 'enum',
+            enum: ENTITY_ENUMS.USER.STATUS,
+            default: 'active'
+        },
         createdAt: {
             name: 'created_at',
             type: 'timestamp',
@@ -47,15 +51,19 @@ module.exports = new EntitySchema({
         updatedAt: {
             name: 'updated_at',
             type: 'timestamp',
-            createDate: true,
+            updateDate: true,
         },
     },
     relations: {
         cartItems: {
             type: 'one-to-many',
-            target: 'CartItem',
+            target: ENTITY_NAMES.CART_ITEM,
             inverseSide: 'user'
         },
-        
+        connections: {
+            type: 'one-to-many',
+            target: ENTITY_NAMES.USER_CONNECTION,
+            inverseSide: 'user'
+        }
     },
 });

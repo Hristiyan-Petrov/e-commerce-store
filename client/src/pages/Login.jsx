@@ -20,16 +20,18 @@ const LoginPage = () => {
     const { summary, isMerging } = useCart();
 
     const handleGoogleLogin = () => {
-        const API_URL = import.meta.env.VITE_API_URL;
-        console.log(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`);
         window.location.href = `${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`;
+    };
+
+    const handleGitHubLogin = () => {
+        window.location.href = `${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.GITHUB}`;
     };
 
     return (
         <Container component="main" maxWidth="lg">
             {summary.itemCount > 0 && (
                 <Alert severity="info" sx={{ mb: 2 }}>
-                    You have {summary.itemCount} item(s) in your cart.
+                    You have {summary.totalQuantity} item(s) in your cart.
                     Sign in to save them!
                 </Alert>
             )}
@@ -103,7 +105,7 @@ const LoginPage = () => {
                             <IconButton aria-label="Sign in with Facebook">
                                 <Facebook sx={{ color: '#1877F2' }} />
                             </IconButton>
-                            <IconButton aria-label="Sign in with GitHub">
+                            <IconButton aria-label="Sign in with GitHub" onClick={handleGitHubLogin}>
                                 <GitHub sx={{ color: '#333' }} />
                             </IconButton>
                         </Stack>

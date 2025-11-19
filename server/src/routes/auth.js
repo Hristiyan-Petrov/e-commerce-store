@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('../config/passport');
-const { handleGoogleCallback, getCurrentUser, logout } = require('../controllers/auth');
+const { getCurrentUser, logout, handleOAuthCallback } = require('../controllers/auth');
 
 const router = express.Router();
 
@@ -14,7 +14,20 @@ router.get('/google/callback',
         session: false,
         failureRedirect: `${process.env.CLIENT_URL}/login?error=auth_failed`
     }),
-    handleGoogleCallback
+    handleOAuthCallback
+);
+
+router.get('/github', passport.authenticate('github', {
+    scope: ['profile', 'user'],
+    session: false
+}));
+
+router.get('/github/callback',
+    passport.authenticate('github', {
+        session: false,
+        failureRedirect: `${process.env.CLIENT_URL}/login?error=auth_failed`
+    }),
+    handleOAuthCallback
 );
 
 router.get('/me', getCurrentUser);

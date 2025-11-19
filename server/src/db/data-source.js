@@ -2,6 +2,7 @@ const { DataSource } = require('typeorm');
 const Product = require('../entities/Product');
 const CartItem = require('../entities/CartItem');
 const User = require('../entities/User');
+const UserConnection = require('../entities/UserConnection');
 
 const AppDataSource = new DataSource({
     type: "postgres",
@@ -13,7 +14,7 @@ const AppDataSource = new DataSource({
     ssl: true,
     synchronize: true,
     // logging: true,
-    entities: [Product, User, CartItem],
+    entities: [Product, User, CartItem, UserConnection],
     subscribers: [],
     migrations: [],
 });

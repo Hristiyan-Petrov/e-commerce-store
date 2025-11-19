@@ -9,7 +9,7 @@ module.exports = {
     generateToken: (user) =>
         jwt.sign(
             {
-                userId: user.id,
+                id: user.id,
                 email: user.email
             },
             process.env.JWT_SECRET,
@@ -25,14 +25,14 @@ module.exports = {
     },
 
     getUserById: async (id) => {
+        if (!id) throw new Error('User ID is required to fetch uesr');
+
         const user = await userRepo.findOne({
             where: { id },
             select: ['id', 'email', 'name', 'picture', 'phoneNumber', 'role', 'status']
         });
 
-        if (!user) {
-            throw new Error('User not found');
-        }
+        if (!user) throw new Error('User not found');
 
         return user;
     },

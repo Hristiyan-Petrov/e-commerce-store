@@ -30,7 +30,7 @@ const getCurrentUser = async (req, res) => {
         }
 
         const decoded = authService.verifyToken(token);
-        const user = await authService.getUserById(decoded.id)
+        const user = await authService.getUserById(decoded.userId)
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });

@@ -9,7 +9,7 @@ module.exports = {
     generateToken: (user) =>
         jwt.sign(
             {
-                id: user.id,
+                userId: user.id,
                 email: user.email
             },
             process.env.JWT_SECRET,

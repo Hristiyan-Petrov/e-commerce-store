@@ -49,8 +49,8 @@ export default function MiniCartIcon({
                         }
                     }}
                 >
-                    
-                    <IconPopTransition condition={open} defaultIcon={<ShoppingCartOutlinedIcon/>} alternateIcon={<ShoppingCartIcon/>} />
+                    <ShoppingCartOutlinedIcon/>
+                    {/* <IconPopTransition condition={open} defaultIcon={<ShoppingCartOutlinedIcon/>} alternateIcon={<ShoppingCartIcon/>} /> */}
                 
                 </Badge>
             </NavIcon>

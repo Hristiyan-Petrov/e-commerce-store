@@ -20,13 +20,10 @@ import { useState } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
-import { pushToDataLayer } from '../../utils/dataLayer';
-import { ANALYTICS_EVENTS } from '../../constants/analytics';
 import IconPopTransition from './IconPopTransition';
 
 const ProductCard = ({ product }) => {
     const [isAdding, setIsAdding] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
     const [showError, setShowError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -64,25 +61,6 @@ const ProductCard = ({ product }) => {
         setShowError(false);
         try {
             await addToCart(id, 1, product);
-            setShowSuccess(true);
-
-            window.dispatchEvent(new CustomEvent('showNavbar'));
-
-            // Track event
-            pushToDataLayer(ANALYTICS_EVENTS.CART.ADD_TO_CART, {
-                user_status: user ? 'logged_in' : 'guest',
-                ecommerce: {
-                    currency: 'USD',
-                    value: hasSale ? displaySalePrice : displayPrice,
-                    items: [{
-                        item_id: String(id),
-                        item_name: name,
-                        price: hasSale ? displaySalePrice : displayPrice,
-                        quantity: 1,
-                        discount: hasSale ? displayPrice - displaySalePrice : 0
-                    }]
-                }
-            });
         } catch (error) {
             console.error('Failed to add to cart:', error);
             setErrorMessage(error.message || 'Failed to add item to cart');
@@ -187,40 +165,6 @@ const ProductCard = ({ product }) => {
                     </Stack>
                 </CardContent>
             </Card>
-
-            {/* Snackbars */}
-            <Snackbar
-                open={showSuccess}
-                autoHideDuration={4000}
-                onClose={() => setShowSuccess(false)}
-                anchorOrigin={responsiveAnchor}
-            >
-                <Alert
-                    onClose={() => setShowSuccess(false)}
-                    severity="success"
-                    // variant="filled"
-                    //     onClick={() => {
-                    //         setShowSuccess(false);
-                    //         window.dispatchEvent(new CustomEvent('openMiniCart'));
-                    //     }}
-                    // >
-                    //     Added to cart.
-                    action={
-                        <Button
-                            color="inherit"
-                            size="small"
-                            onClick={() => {
-                                setShowSuccess(false);
-                                window.dispatchEvent(new CustomEvent('openMiniCart'));
-                            }}
-                        >
-                            VIEW CART
-                        </Button>
-                    }
-                >
-                    Added to cart!
-                </Alert>
-            </Snackbar >
 
             <Snackbar
                 open={showError}

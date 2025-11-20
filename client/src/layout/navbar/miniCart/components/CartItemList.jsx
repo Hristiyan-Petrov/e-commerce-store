@@ -28,18 +28,10 @@ export default function CartItemList({
         <Box
             component="section"
             sx={{
-                flex: { sm: 5 },
+                // flex: { sm: 5 },
+                width: '100%'
             }}
         >
-            <Typography
-                variant="h6"
-                sx={{
-                    textAlign: 'center',
-                }}
-            >
-                Your shopping cart
-            </Typography>
-
             <List>
                 <AnimatePresence>
                     {items.map(item => (

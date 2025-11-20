@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import cartApi from '../api/cart';
 import { LOCAL_STORAGE_OPERATIONS } from "../constants/storage";
+import { trackAddToCart } from "../utils/analytics";
 
 export function useCartContextState() {
     const [cartItems, setCartItems] = useState([]);
@@ -120,13 +121,14 @@ export function useCartContextState() {
 
     const addToCart = useCallback(async (productId, quantity = 1, productData) => {
         try {
-            // User logged in - add to server cart
+            let result;
+
             if (user) {
+                // User logged in - add to server cart
                 const response = await cartApi.addToCart(productId, quantity);
                 await loadServerCartItems();
-                window.dispatchEvent(new CustomEvent('showNavbar'));
-                setIsCartIconAnimating(true);
-                return response;
+                result = response;
+                // setIsCartIconAnimating(true);
             } else {
                 // Guest user - add to localStorage
                 const guestCartItems = LOCAL_STORAGE_OPERATIONS.GUEST_CART.getGuestCartItems();
@@ -155,9 +157,18 @@ export function useCartContextState() {
 
                 LOCAL_STORAGE_OPERATIONS.GUEST_CART.saveGuestCartItems(guestCartItems);
                 loadGuestCartItems();
-                setIsCartIconAnimating(true);
-                return { success: true, message: 'Added to cart' };
+                // setIsCartIconAnimating(true);
+                result = { success: true, message: 'Added to cart' };
             }
+
+            if (productData) {
+                trackAddToCart(productData, quantity, user);
+            }
+            window.dispatchEvent(new CustomEvent('openMiniCart', {
+                detail: { newItem: true }
+            }));
+            return result;
+
         } catch (error) {
             console.error('Failed to add to cart:', error);
             throw error;

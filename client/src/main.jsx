@@ -112,7 +112,7 @@ createRoot(document.getElementById('root')).render(
                             </Route>
                         </Routes>
                     </BrowserRouter>
-                </CartProvider>F
+                </CartProvider>
             </AuthProvider>
         </ThemeProvider>
     </StrictMode>

@@ -64,9 +64,10 @@ function CartItem({
             disablePadding
             sx={{
                 my: 2,
-                borderRadius: 3,
-                backgroundColor: 'background.paper',
+                borderBottom: '1px solid',
+                borderColor: 'divider',
                 opacity: isUpdating ? 0.6 : 1,
+                // backgroundColor: 'background.paper',
                 // overflow: "hidden"
             }}
         >

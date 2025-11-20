@@ -54,7 +54,7 @@ export default function AccountMenu({
             aria-label={ariaLabel}
             aria-hidden={ariaHidden}
             paperSx={{
-                borderRadius: '0 0 8px 8px' 
+                borderRadius: '0 0 8px 8px'
             }}
             {...props}
         >
@@ -128,7 +128,7 @@ export default function AccountMenu({
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                             Get access to your account and unlock exclusive offers.
                         </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Stack gap={2}>
                             <Button
                                 component={RouterLink}
                                 to={ROUTES.LOGIN}
@@ -143,10 +143,15 @@ export default function AccountMenu({
                                 variant="contained"
                                 color="secondary"
                                 onClick={() => toggle()}
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: 'primary.dark'
+                                    }
+                                }}
                             >
                                 Create Account
                             </Button>
-                        </Box>
+                        </Stack>
                     </Box>
                 )
             }

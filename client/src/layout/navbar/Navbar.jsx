@@ -42,6 +42,7 @@ const Navbar = () => {
                 transform: isNavbarVisible ? 'translateY(0)' : 'translateY(-100%)',
                 // transform: scrollDirection === 'down' ? 'translateY(-100%)' : 'translateY(0)',
                 transition: 'transform 0.3s',
+                zIndex: (theme) => theme.zIndex.drawer + 1,
             }}
             component='nav'
             role="navigation"

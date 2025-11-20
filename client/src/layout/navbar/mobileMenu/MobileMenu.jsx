@@ -4,6 +4,7 @@ import { Link as RouterLink } from "react-router";
 import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
 import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
 import { NAV_LINKS } from "../navConfig";
+import AppDrawer from "../../../components/common/MenuDrawer";
 
 export default function MobileMenu({
     open,
@@ -15,11 +16,25 @@ export default function MobileMenu({
     useCloseOnScroll(open, toggle);
 
     return (
-        <TopDrawerMenu
-            key='mobile-menu'
+        <AppDrawer
+            // key='mobile-menu'
+            // open={open}
+            // aria-label={ariaLabel}
+            // aria-hidden={ariaHidden}
+            // {...props}
+            anchor="top"
             open={open}
-            aria-label={ariaLabel}
-            aria-hidden={ariaHidden}
+            toggle={toggle}
+            showCloseIcon={false}
+            paperSx={{
+                mt: '56px', // Offset for Navbar height
+                boxShadow: 'none',
+                borderTop: '5px solid',
+                borderTopColor: 'primary.main'
+            }}
+            ModalProps={{
+                keepMounted: true,
+            }}
             {...props}
         >
             <Box
@@ -48,6 +63,6 @@ export default function MobileMenu({
                     ))
                 }
             </Box>
-        </TopDrawerMenu>
+        </AppDrawer>
     );
 };

@@ -6,29 +6,16 @@ import { AnimatePresence, motion } from 'motion/react';
 
 export default function CartItemList({
     items,
-    toggle
+    toggle,
+    updatingItemIds,
+    onUpdateQuantity,
+    onRemove,
 }) {
-    const [updatingItems, setUpdatingItems] = useState(new Set());
-    const { removeFromCart, updateQuantity } = useCart();
-
-    const handleCartOperation = async (operation, cartItemId, ...args) => {
-        setUpdatingItems(prev => new Set(prev).add(cartItemId));
-        try {
-            await operation(cartItemId, ...args);
-        } finally {
-            setUpdatingItems(prev => {
-                const next = new Set(prev);
-                next.delete(cartItemId);
-                return next;
-            });
-        }
-    };
-
     return (
         <Box
             component="section"
             sx={{
-                // flex: { sm: 5 },
+                flex: { sm: 5 },
                 width: '100%'
             }}
         >
@@ -39,9 +26,12 @@ export default function CartItemList({
                             key={item.id}
                             item={item}
                             toggle={toggle}
-                            isUpdating={updatingItems.has(item.id)}
-                            onRemove={() => handleCartOperation(removeFromCart, item.id)}
-                            onQuantityUpdate={(newQuantity) => handleCartOperation(updateQuantity, item.id, newQuantity)}
+                            // isUpdating={updatingItems.has(item.id)}
+                            // onRemove={() => handleCartOperation(removeFromCart, item.id)}
+                            // onQuantityUpdate={(newQuantity) => handleCartOperation(updateQuantity, item.id, newQuantity)}
+                            isUpdating={updatingItemIds.has(item.id)}
+                            onRemove={() => onRemove(item.id)}
+                            onQuantityUpdate={(newQuantity) => onUpdateQuantity(item.id, newQuantity)}
                         />
                     ))}
                 </AnimatePresence>

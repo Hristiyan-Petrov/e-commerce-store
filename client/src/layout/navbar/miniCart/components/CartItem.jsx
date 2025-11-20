@@ -57,13 +57,13 @@ function CartItem({
         <ListItem
             component={motion.li}
             variants={cartItemVariants}
-            initial="initial"
+            // initial="initial"
             animate="animate"
             exit="exit"
             layout
             disablePadding
             sx={{
-                my: 2,
+                pb: 2,
                 borderBottom: '1px solid',
                 borderColor: 'divider',
                 opacity: isUpdating ? 0.6 : 1,

@@ -2,6 +2,8 @@ import NavIcon from '../../../components/common/NavIcon';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import IconPopTransition from '../../../components/common/IconPopTransition';
+import { Link as RouterLink } from "react-router";
+import { ROUTES } from '../../../constants/routes';
 
 export default function AccountIcon({
     open,

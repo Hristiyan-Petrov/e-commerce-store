@@ -23,10 +23,10 @@ export default function AppDrawer({
     open,
     toggle,
     title,
-    anchor = 'right', // Default to right
+    anchor = 'right',
     footer,
     children,
-    width, // Optional custom width
+    width,
     showCloseIcon = true,
     headerSx = {},
     paperSx = {},

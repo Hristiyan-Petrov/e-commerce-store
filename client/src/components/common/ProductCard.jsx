@@ -28,7 +28,6 @@ const ProductCard = ({ product }) => {
     const [errorMessage, setErrorMessage] = useState('');
 
     const { addToCart } = useCart();
-    const { user } = useAuth();
     const navigate = useNavigate();
 
     const {

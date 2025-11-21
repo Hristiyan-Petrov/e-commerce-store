@@ -57,7 +57,6 @@ function CartItem({
         <ListItem
             component={motion.li}
             variants={cartItemVariants}
-            // initial="initial"
             animate="animate"
             exit="exit"
             layout
@@ -67,8 +66,6 @@ function CartItem({
                 borderBottom: '1px solid',
                 borderColor: 'divider',
                 opacity: isUpdating ? 0.6 : 1,
-                // backgroundColor: 'background.paper',
-                // overflow: "hidden"
             }}
         >
             <Box

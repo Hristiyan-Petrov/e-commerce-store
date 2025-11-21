@@ -9,6 +9,7 @@ import LoginPage from './pages/Login.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ROUTES } from './constants/routes.js';
+import CartPage from './pages/CartPage.jsx';
 
 const theme = createTheme({
     palette: {
@@ -109,6 +110,7 @@ createRoot(document.getElementById('root')).render(
                                         </GuestRoute>
                                     }
                                 />
+                                <Route path='/cart' element={<CartPage />} />
                             </Route>
                         </Routes>
                     </BrowserRouter>
@@ -116,4 +118,4 @@ createRoot(document.getElementById('root')).render(
             </AuthProvider>
         </ThemeProvider>
     </StrictMode>
-)
+);

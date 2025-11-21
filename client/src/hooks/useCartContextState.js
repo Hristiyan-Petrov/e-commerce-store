@@ -165,7 +165,11 @@ export function useCartContextState() {
                 trackAddToCart(productData, quantity, user);
             }
             window.dispatchEvent(new CustomEvent('openMiniCart', {
-                detail: { newItem: true }
+                detail: {
+                    newItem: true,
+                    product: productData,
+                    quantity: quantity
+                },
             }));
             return result;
 

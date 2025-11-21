@@ -15,7 +15,6 @@ import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import AppDrawer from '../../../components/common/MenuDrawer';
 
 const viewVariants = {
     initial: { opacity: 0, y: 10 },

@@ -1,8 +1,6 @@
-import { Box, List, Typography } from "@mui/material";
+import { Box, List } from "@mui/material";
 import CartItem from "./CartItem";
-import { useState } from "react";
-import { useCart } from "../../../../context/CartContext";
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 
 export default function CartItemList({
     items,

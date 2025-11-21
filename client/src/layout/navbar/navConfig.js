@@ -8,6 +8,7 @@ import SearchMenuIcon from "./search/SearchMenuIcon.jsx";
 import SearchMenu from "./search/SearchMenu.jsx";
 import { SHOW_MD_DOWN, SHOW_MOBILE_ONLY } from "../../constants/breakpoints.js";
 import { ROUTES } from '../../constants/routes.js';
+import AddedToCartDrawer from "./miniCart/components/AddedToCartDrawer.jsx";
 
 export const NAV_LINKS = [
     { label: 'Shop', to: ROUTES.PRODUCTS.SHOP },
@@ -49,9 +50,10 @@ export const NAV_FEATURES = [
     {
         id: 'miniCart',
         Icon: MiniCartIcon,
-        Menu: MiniCartMenu,
+        // Menu: MiniCartMenu,
+        Menu: AddedToCartDrawer,
         iconProps: {
-            'aria-label': 'Open shopping cart',
+            'aria-label': 'Go to cart',
             'aria-expanded': false
         },
         menuProps: {

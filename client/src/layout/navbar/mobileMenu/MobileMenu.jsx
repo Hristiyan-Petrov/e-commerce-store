@@ -4,7 +4,7 @@ import { Link as RouterLink } from "react-router";
 import TopDrawerMenu from "../../../components/common/TopDrawerMenu";
 import { useCloseOnScroll } from "../../../hooks/useCloseOnScroll";
 import { NAV_LINKS } from "../navConfig";
-import AppDrawer from "../../../components/common/MenuDrawer";
+import AppDrawer from "../../../components/common/AppDrawer";
 
 export default function MobileMenu({
     open,

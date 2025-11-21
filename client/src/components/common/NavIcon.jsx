@@ -1,9 +1,10 @@
-import { alpha, IconButton, useTheme } from "@mui/material";
+import { IconButton, useTheme } from "@mui/material";
 
 export default function NavIcon({
     toggle,
     sx = {},
-    children
+    children,
+    ...props
 }) {
     const theme = useTheme();
 
@@ -21,6 +22,7 @@ export default function NavIcon({
                 },
                 ...sx
             }}
+            {...props}
         >
             {children}
         </IconButton>

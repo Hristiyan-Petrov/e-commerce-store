@@ -1,7 +1,7 @@
-import { Box, IconButton, TextField, Typography } from "@mui/material";
+import { Box, IconButton, TextField } from "@mui/material";
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { motion, AnimatePresence } from "motion/react";
+import { motion, useAnimation } from "motion/react";
 import { useEffect, useState } from "react";
 
 export default function QuantityStepper({
@@ -10,9 +10,16 @@ export default function QuantityStepper({
     onQuantityUpdate
 }) {
     const [inputValue, setInputValue] = useState(item.quantity);
+    const controls = useAnimation();
+
     useEffect(() => {
         setInputValue(item.quantity);
-    }, [item.quantity]);
+        
+        controls.start({
+            scale: [1, 1.2, 1],
+            transition: { duration: 0.2 }
+        });
+    }, [item.quantity, controls]);
 
     const handleBlur = () => {
         const newQuantity = parseInt(inputValue, 10);
@@ -26,25 +33,7 @@ export default function QuantityStepper({
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
-            handleBlur();
             e.target.blur();
-        }
-    };
-
-    const popAnimation = {
-        variants: {
-            hidden: {
-                scale: 0.5, opacity: 0,
-                transition: {
-                    duration: 0.1,
-                },
-            },
-            visible: {
-                scale: 1, opacity: 1,
-                transition: {
-                    duration: 0.1,
-                },
-            },
         }
     };
 
@@ -55,7 +44,6 @@ export default function QuantityStepper({
                 borderColor: 'secondary.light',
                 borderStyle: 'solid',
                 borderWidth: 2,
-                // px: 0,
                 display: 'flex',
                 alignItems: 'center',
             }}
@@ -68,47 +56,36 @@ export default function QuantityStepper({
                 <RemoveOutlinedIcon fontSize="small" />
             </IconButton>
 
-            {/* <Typography variant="subtitle1" sx={{ minWidth: '2ch', textAlign: 'center' }}>
-                {item.quantity}
-            </Typography> */}
-
-            <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                    key={item.quantity}
-                    variants={popAnimation.variants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    transition={popAnimation.transition}
-                >
-                    <TextField
-                        type="number"
-                        variant="standard"
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onBlur={handleBlur}
-                        onKeyDown={handleKeyDown}
-                        disabled={isUpdating}
-                        sx={{
-                            width: '3ch', // Adjusted width for a snug fit
-                            // Remove default number input arrows
-                            '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-                                'WebkitAppearance': 'none',
-                                margin: 0,
-                            },
-                            '& input[type=number]': {
-                                'MozAppearance': 'textfield',
-                            },
-                            '& .MuiInputBase-input': {
-                                textAlign: 'center',
-                                fontWeight: 'bold',
-                                padding: '4px 0', // Adjusted padding
-                            },
-                        }}
-                        InputProps={{ disableUnderline: true }}
-                    />
-                </motion.div>
-            </AnimatePresence>
+            {/* Use motion.div wrapper for animation, but NO 'key' to prevent unmounting */}
+            <motion.div
+                animate={controls}
+            >
+                <TextField
+                    type="number"
+                    variant="standard"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    disabled={isUpdating}
+                    sx={{
+                        width: '3ch',
+                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                            'WebkitAppearance': 'none',
+                            margin: 0,
+                        },
+                        '& input[type=number]': {
+                            'MozAppearance': 'textfield',
+                        },
+                        '& .MuiInputBase-input': {
+                            textAlign: 'center',
+                            fontWeight: 'bold',
+                            padding: '4px 0',
+                        },
+                    }}
+                    InputProps={{ disableUnderline: true }}
+                />
+            </motion.div>
 
             <IconButton
                 size="small"

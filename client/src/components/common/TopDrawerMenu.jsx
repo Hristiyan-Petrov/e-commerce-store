@@ -2,6 +2,7 @@ import { Drawer } from "@mui/material";
 
 const TopDrawerMenu = ({
     open,
+    toggle,
     sx = {},
     paperSx = {},
     children,

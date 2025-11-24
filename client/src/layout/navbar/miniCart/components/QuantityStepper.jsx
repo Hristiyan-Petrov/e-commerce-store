@@ -1,33 +1,65 @@
 import { Box, IconButton, TextField } from "@mui/material";
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { motion, useAnimation } from "motion/react";
-import { useEffect, useState } from "react";
+import { motion, useAnimation } from "motion/react"; 
+import { useEffect, useState, useRef } from "react";
 
 export default function QuantityStepper({
     item,
     isUpdating,
     onQuantityUpdate
 }) {
-    const [inputValue, setInputValue] = useState(item.quantity);
+    const [localQuantity, setLocalQuantity] = useState(item.quantity);
     const controls = useAnimation();
+    
+    const debounceTimerRef = useRef(null);
+
+    // Sync local state if the server value changes externally 
+    // (e.g., after the API call finishes and returns the confirmed number)
+    useEffect(() => {
+        setLocalQuantity(item.quantity);
+    }, [item.quantity]);
+
+    const handleNewQuantity = (newQty) => {
+        const val = parseInt(newQty, 10);
+        if (isNaN(val) || val < 1) return;
+
+        setLocalQuantity(val);
+
+        if (val !== localQuantity) {
+            controls.start({
+                scale: [1, 1.2, 1],
+                transition: { duration: 0.2 }
+            });
+        }
+
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        debounceTimerRef.current = setTimeout(() => {
+            if (val !== item.quantity) {
+                onQuantityUpdate(val);
+            }
+        }, 500);
+    };
 
     useEffect(() => {
-        setInputValue(item.quantity);
-        
-        controls.start({
-            scale: [1, 1.2, 1],
-            transition: { duration: 0.2 }
-        });
-    }, [item.quantity, controls]);
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
 
     const handleBlur = () => {
-        const newQuantity = parseInt(inputValue, 10);
-
-        if (isNaN(newQuantity) || newQuantity < 1) {
-            setInputValue(item.quantity);
-        } else if (newQuantity !== item.quantity) {
-            onQuantityUpdate(newQuantity);
+        if (localQuantity < 1 || isNaN(localQuantity)) {
+            setLocalQuantity(item.quantity);
+        } else {
+             if (localQuantity !== item.quantity) {
+                if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+                onQuantityUpdate(localQuantity);
+            }
         }
     };
 
@@ -50,21 +82,29 @@ export default function QuantityStepper({
         >
             <IconButton
                 size="small"
-                onClick={() => onQuantityUpdate(item.quantity - 1)}
-                disabled={isUpdating || item.quantity <= 1}
+                onClick={() => handleNewQuantity(localQuantity - 1)}
+                disabled={isUpdating || localQuantity <= 1}
             >
                 <RemoveOutlinedIcon fontSize="small" />
             </IconButton>
 
-            {/* Use motion.div wrapper for animation, but NO 'key' to prevent unmounting */}
             <motion.div
                 animate={controls}
             >
                 <TextField
                     type="number"
                     variant="standard"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    value={localQuantity}
+                    onChange={(e) => {
+                        // Allow typing, handle debounce via handleNewQuantity
+                        // We pass the raw value, handleNewQuantity parses it
+                         const val = e.target.value;
+                         if (val === '') {
+                             setLocalQuantity(''); // Allow clearing input temporarily
+                         } else {
+                             handleNewQuantity(val);
+                         }
+                    }}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
                     disabled={isUpdating}
@@ -89,7 +129,7 @@ export default function QuantityStepper({
 
             <IconButton
                 size="small"
-                onClick={() => onQuantityUpdate(item.quantity + 1)}
+                onClick={() => handleNewQuantity(localQuantity + 1)}
                 disabled={isUpdating}
             >
                 <AddOutlinedIcon fontSize="small" />

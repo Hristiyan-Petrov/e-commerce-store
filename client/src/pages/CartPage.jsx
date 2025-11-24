@@ -58,7 +58,7 @@ export default function CartPage() {
     }
 
     return (
-        <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 8 }}>
+        <Box>
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 
                 {/* Breadcrumbs & Header */}

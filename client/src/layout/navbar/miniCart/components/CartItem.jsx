@@ -13,7 +13,6 @@ const cartItemVariants = {
     exit: {
         opacity: 0,
         x: -200, // Slide to the left
-        // heigth: 0, // Animate to height 0
         transition: { duration: 0.3 }
     }
 };
@@ -62,10 +61,13 @@ function CartItem({
             layout
             disablePadding
             sx={{
-                pb: 2,
+                // pb: 2,
                 borderBottom: '1px solid',
                 borderColor: 'divider',
                 opacity: isUpdating ? 0.6 : 1,
+                '&:last-child' : {
+                    borderBottom: 'none'
+                }
             }}
         >
             <Box

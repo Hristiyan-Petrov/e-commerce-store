@@ -22,7 +22,7 @@ const ENTITY_ENUMS = {
         PROVIDER: Object.values(OAUTH_PROVIDERS),
     },
     PRODUCT: {
-        CATEGORY: ['uncategorized', 'keyboards', 'mice', 'monitors']
+        CATEGORY: ['uncategorized', 'keyboards', 'mice', 'monitors', 'audio', 'accessories'],
     }
 };
 

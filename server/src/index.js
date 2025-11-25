@@ -8,6 +8,7 @@ const { AppDataSource } = require('./db/data-source');
 const productRoutes = require('./routes/product');
 const authRoutes = require('./routes/auth');
 const cartRoutes = require('./routes/cart');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -25,6 +26,9 @@ app.use(passport.initialize());
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
+
+//Error Handler
+app.use(errorHandler);
 
 const startServer = async () => {
     try {

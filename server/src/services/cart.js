@@ -1,4 +1,5 @@
 const { AppDataSource } = require('../db/data-source');
+const AppError = require('../utils/AppError');
 const { ENTITY_NAMES } = require('../utils/constants');
 
 const cartItemRepository = AppDataSource.getRepository(ENTITY_NAMES.CART_ITEM);
@@ -56,16 +57,14 @@ module.exports = {
     addToCart: async (userId, productId, quantity = 1) => {
         return await AppDataSource.transaction(async (transactionalEnityManager) => {
 
-            // Validate product exists
             const product = await transactionalEnityManager.findOne(ENTITY_NAMES.PRODUCT, {
                 where: { id: productId },
             });
 
             if (!product) {
-                throw new Error('Product not found');
+                throw new AppError('Product not found', 404);
             }
 
-            // Check if item already in cart
             const existingItem = await transactionalEnityManager.findOne(ENTITY_NAMES.CART_ITEM, {
                 where: { userId, productId },
                 // Lock the row to prevent interference
@@ -107,7 +106,7 @@ module.exports = {
      */
     updateCartItemQuantity: async (userId, cartItemId, quantity) => {
         if (quantity < 1) {
-            throw new Error('Quantity must be at least 1');
+            throw new AppError('Quantity must be at least 1', 400);
         }
 
         return AppDataSource.transaction(async (transactionalEnityManager) => {
@@ -117,7 +116,7 @@ module.exports = {
             });
 
             if (!cartItem) {
-                throw new Error('Cart item not found');
+                throw new AppError('Cart item not found', 404);
             }
 
             cartItem.quantity = quantity;
@@ -144,7 +143,7 @@ module.exports = {
         });
 
         if (!cartItem) {
-            throw new Error('Cart item not found');
+            throw new AppError('Cart item not found', 404);
         }
 
         await cartItemRepository.remove(cartItem);
@@ -307,7 +306,7 @@ module.exports = {
             };
         });
 
-        console.log('Merging carts result: ' + mergeResults);
+        console.log('Merging carts result: ', JSON.stringify(mergeResults));
         return {
             cartItems: await this.getUserCartItems(userId),
             summary: await this.getCartSummary(userId),

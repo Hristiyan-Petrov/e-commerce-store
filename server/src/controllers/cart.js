@@ -1,240 +1,138 @@
 const cartService = require('../services/cart');
+const AppError = require('../utils/AppError');
+const catchAsyncHandler = require('../utils/catchAsyncHandler');
 
 module.exports = {
     /**
      * GET /api/cart
      * Get user's cart
      */
-    getCartItems: async (req, res) => {
-        try {
-            const userId = req.user.userId;
-            const cartItems = await cartService.getUserCartItems(userId);
-
-            res.json({
-                success: true,
-                cartItems
-            });
-        } catch (error) {
-            console.error('Get cart error:', error);
-            res.status(500).json({
-                success: false,
-                error: 'Failed to get cart'
-            });
-        }
-    },
+    getCartItems: catchAsyncHandler(async (req, res) => {
+        const cartItems = await cartService.getUserCartItems(req.user.userId);
+        res.json({
+            success: true,
+            cartItems
+        });
+    }),
 
     /**
      * GET /api/cart/summary
      * Get cart summary (totals, counts)
      */
-    getCartSummary: async (req, res) => {
-        try {
-            const userId = req.user.userId;
-            const summary = await cartService.getCartSummary(userId);
-
-            res.json({
-                success: true,
-                summary
-            });
-        } catch (error) {
-            console.error('Get cart summary error:', error);
-            res.status(500).json({
-                success: false,
-                error: 'Failed to get cart summary'
-            });
-        }
-    },
+    getCartSummary: catchAsyncHandler(async (req, res) => {
+        const summary = await cartService.getCartSummary(req.user.userId);
+        res.json({
+            success: true,
+            summary
+        });
+    }),
 
     /**
      * POST /api/cart
      * Add item to cart
      * Body: { productId, quantity }
      */
-    addToCart: async (req, res) => {
-        try {
-            const userId = req.user.userId;
-            const { productId, quantity = 1 } = req.body;
+    addToCart: catchAsyncHandler(async (req, res) => {
+        const userId = req.user.userId;
+        const { productId, quantity = 1 } = req.body;
 
-            // Validation
-            if (!productId) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Product ID is required'
-                });
-            }
+        quantity = parseInt(quantity);
 
-            if (quantity < 1 || !Number.isInteger(quantity)) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Quantity must be a positive integer'
-                });
-            }
-
-            const cartItem = await cartService.addToCart(userId, productId, quantity);
-            const summary = await cartService.getCartSummary(userId);
-
-            res.status(201).json({
-                success: true,
-                cartItem,
-                summary,
-                message: 'Item added to cart'
-            });
-        } catch (error) {
-            console.error('Add to cart error:', error);
-
-            if (error.message === 'Product not found') {
-                return res.status(404).json({
-                    success: false,
-                    error: error.message
-                });
-            }
-
-            res.status(500).json({
-                success: false,
-                error: 'Failed to add item to cart'
-            });
+        if (!productId) {
+            throw new AppError('Product ID is required', 400)
         }
-    },
+
+        if (quantity < 1 || !Number.isInteger(quantity)) {
+            throw new AppError('Quantity must be a positive integer', 400);
+        }
+
+        const cartItem = await cartService.addToCart(userId, productId, quantity);
+        const summary = await cartService.getCartSummary(userId);
+
+        res.status(201).json({
+            success: true,
+            message: 'Item added to cart',
+            cartItem,
+            summary,
+        });
+    }),
 
     /**
      * PUT /api/cart/:id
      * Update cart item quantity
      * Body: { quantity }
      */
-    updateCartItem: async (req, res) => {
-        try {
-            const userId = req.user.userId;
-            const cartItemId = parseInt(req.params.id);
-            const { quantity } = req.body;
+    updateCartItem: catchAsyncHandler(async (req, res) => {
+        const userId = req.user.userId;
+        const cartItemId = parseInt(req.params.id);
+        const { quantity } = req.body;
+        quantity = parseInt(quantity);
 
-            // Validation
-            if (!quantity || quantity < 1 || !Number.isInteger(quantity)) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Valid quantity is required'
-                });
-            }
-
-            const cartItem = await cartService.updateCartItemQuantity(
-                userId,
-                cartItemId,
-                quantity
-            );
-            const summary = await cartService.getCartSummary(userId);
-
-            res.json({
-                success: true,
-                cartItem,
-                summary,
-                message: 'Cart item updated'
-            });
-        } catch (error) {
-            console.error('Update cart item error:', error);
-
-            if (error.message === 'Cart item not found') {
-                return res.status(404).json({
-                    success: false,
-                    error: error.message
-                });
-            }
-
-            if (error.message.includes('Quantity')) {
-                return res.status(400).json({
-                    success: false,
-                    error: error.message
-                });
-            }
-
-            res.status(500).json({
-                success: false,
-                error: 'Failed to update cart item'
-            });
+        if (!quantity || quantity < 1 || !Number.isInteger(quantity)) {
+            throw new AppError('Valid quantity is required', 400);
         }
-    },
+
+        const cartItem = await cartService.updateCartItemQuantity(
+            userId,
+            cartItemId,
+            quantity
+        );
+        const summary = await cartService.getCartSummary(userId);
+
+        res.json({
+            success: true,
+            message: 'Cart item updated',
+            cartItem,
+            summary,
+        });
+    }),
 
     /**
      * DELETE /api/cart/:id
      * Remove item from cart
      */
-    removeFromCart: async (req, res) => {
-        try {
-            const userId = req.user.userId;
-            const cartItemId = parseInt(req.params.id);
+    removeFromCart: catchAsyncHandler(async (req, res) => {
+        const userId = req.user.userId;
+        const cartItemId = parseInt(req.params.id);
 
-            await cartService.removeFromCart(userId, cartItemId);
-            const summary = await cartService.getCartSummary(userId);
+        await cartService.removeFromCart(userId, cartItemId);
+        const summary = await cartService.getCartSummary(userId);
 
-            res.json({
-                success: true,
-                summary,
-                message: 'Item removed from cart'
-            });
-        } catch (error) {
-            console.error('Remove from cart error:', error);
-
-            if (error.message === 'Cart item not found') {
-                return res.status(404).json({
-                    success: false,
-                    error: error.message
-                });
-            }
-
-            res.status(500).json({
-                success: false,
-                error: 'Failed to remove item from cart'
-            });
-        }
-    },
+        res.json({
+            success: true,
+            message: 'Item removed from cart',
+            summary,
+        });
+    }),
 
     /**
      * DELETE /api/cart
      * Clear entire cart
      */
-    clearCart: async (req, res) => {
-        try {
-            const userId = req.user.userId;
-            await cartService.clearCart(userId);
+    clearCart: catchAsyncHandler(async (req, res) => {
+        await cartService.clearCart(req.user.userId);
+        res.json({
+            success: true,
+            message: 'Cart cleared'
+        });
+    }),
 
-            res.json({
-                success: true,
-                message: 'Cart cleared'
-            });
-        } catch (error) {
-            console.error('Clear cart error:', error);
-            res.status(500).json({
-                success: false,
-                error: 'Failed to clear cart'
-            });
+    mergeCarts: catchAsyncHandler(async (req, res) => {
+        const userId = req.user.userId;
+        const { guestCartItems } = req.body;
+
+        if (!Array.isArray(guestCartItems)) {
+            throw new AppError('Invalid guest cart items', 400);
         }
-    },
 
-    mergeCarts: async (req, res) => {
-        try {
-            const userId = req.user.userId;
-            const { guestCartItems } = req.body;
+        const result = await cartService.mergeCarts(userId, guestCartItems);
 
-            if (!Array.isArray(guestCartItems)) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Invalid guest cart items'
-                });
-            }
-
-            const result = await cartService.mergeCarts(userId, guestCartItems);
-
-            res.json({
-                success: true,
-                ...result,
-                message: `Cart merged: ${result.mergeResults.merged} updated, ${result.mergeResults.added} added`
-            });
-        } catch (error) {
-            console.error('Merge carts error: ', error);
-            res.status(500).json({
-                success: false,
-                error: 'Failed to merge carts'
-            });
-        }
-    },
+        res.json({
+            success: true,
+            message: `Cart merged: ${result.mergeResults.merged} updated, ${result.mergeResults.added} added`,
+            ...result,
+        });
+    }),
 
 
 };

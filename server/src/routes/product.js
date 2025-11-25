@@ -1,9 +1,9 @@
 const express = require('express');
-const { getLatest, getAll } = require('../controllers/product');
+const productController = require('../controllers/product');
 
 const router = express.Router();
 
-router.get('/', getAll);
-router.get('/latest', getLatest);
+router.get('/', productController.getAll);
+router.get('/latest', productController.getLatest);
 
 module.exports = router;

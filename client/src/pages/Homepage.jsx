@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 // import HeroSection from '../components/home/HeroSection';
 // import NewArrivals from '../components/home/NewArrivals';
-import { fetchLatest } from '../api/product';
+import productApi from '../api/product';
 import FreeOfferBanner from '../components/home/FreeOfferBanner';
 import HeroSection from '../components/home/HeroSection';
 import NewArrivals from '../components/home/NewArrivals';
@@ -17,8 +17,8 @@ const HomePage = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await fetchLatest(5);
-        setLatestProducts(data);
+        const data = await productApi.getAll();
+        setLatestProducts(data.products);
       } catch (err) {
         setError('Failed to fetch new products. Please try again later.');
         console.error(err);

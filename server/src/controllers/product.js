@@ -1,23 +1,27 @@
 const productService = require('../services/product');
-
-const getLatest = async (req, res) => {
-    try {
-        const limit = Number(req.query.limit);
-        const products = await productService.findLatest(limit);
-        res.status(200).json(products);
-    } catch (error) {
-        // The error thrown from the service will be caught here
-        res.status(500).json({ message: error.message });
-    }
-};
-
-const getAll = async (req, res) => {
-    return productService.findAll()
-        .then(data => res.status(200).json(data))
-        .catch(err => res.status(500).json({ message: err.message }));
-};
+const AppError = require('../utils/AppError');
+const catchAsyncHandler = require('../utils/catchAsyncHandler');
 
 module.exports = {
-    getLatest,
-    getAll
+    getLatest: catchAsyncHandler(async (req, res) => {
+        const limit = parseInt(req.query.limit, 10);
+
+        if (req.query.limit && (limit < 1 || isNaN(limit))) {
+            throw new AppError('Limit must be a positive integer', 400);
+        }
+
+        const products = await productService.findLatest(limit);
+        res.status(200).json({
+            success: true,
+            products
+        });
+    }),
+
+    getAll: catchAsyncHandler(async (req, res) => {
+        const products = await productService.findAll();
+        res.status(200).json({
+            success: true,
+            products
+        });
+    }),
 };

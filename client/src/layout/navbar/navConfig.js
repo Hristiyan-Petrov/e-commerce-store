@@ -30,7 +30,7 @@ export const NAV_FEATURES = [
         },
         menuProps: {
             'aria-label': 'Search products',
-            // products: await fetchAll()
+            // products: await getAll()
             // role: 'dialog'
         }
     },

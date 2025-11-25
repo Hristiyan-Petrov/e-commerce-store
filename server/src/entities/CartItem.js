@@ -45,6 +45,7 @@ module.exports = new EntitySchema({
             type: 'many-to-one',
             target: ENTITY_NAMES.PRODUCT,
             joinColumn: { name: 'product_id' },
+            onDelete: 'CASCADE'
         }
     },
     uniques: [ // User can't have duplicate products in cart

@@ -6,7 +6,7 @@ import { Link as RouterLink } from "react-router";
 import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll';
 import { hoverBackgroundFill } from '../../../styles/common';
 import { useEffect, useState } from 'react';
-import { fetchAll } from '../../../api/product';
+import productApi from '../../../api/product';
 import { ROUTES } from "../../../constants/routes";
 
 const searchRelatedLinks = [
@@ -31,10 +31,9 @@ export default function SearchMenu({
     useEffect(() => {
         if (open) {
 
-            const loadProducts = () => fetchAll()
+            const loadProducts = () => productApi.getAll()
                 .then((data) => {
-                    setProducts(data);
-                    console.log(data)
+                    setProducts(data.products);
                 }).catch(error => {
                     console.log(error);
                 });

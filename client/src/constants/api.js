@@ -18,7 +18,9 @@ export const API_ENDPOINTS = {
     },
 
     PRODUCTS: {
-
+        BASE: '/api/products',
+        LATEST: '/api/products/latest',
+        ID: (id) => `/api/products/${id}`,
     },
 
     ORDERS: {

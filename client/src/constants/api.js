@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
     PRODUCTS: {
         BASE: '/api/products',
         LATEST: '/api/products/latest',
+        ADDED_TO_CART_RECOMMENDATIONS: (id) => `/api/products/${id}/recommendations`,
         ID: (id) => `/api/products/${id}`,
     },
 

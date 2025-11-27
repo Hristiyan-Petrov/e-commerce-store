@@ -4,6 +4,15 @@ export const APP_CONFIG = {
     SUPPORT_EMAIL: 'support@mystore.com',
 };
 
+export const PRODUCT_CATEGORIES = {
+    UNCATEGORIZED: 'uncategorized',
+    KEYBOARDS: 'keyboards',
+    MICE: 'mice',
+    MONITORS: 'monitors',
+    AUDIO: 'audio',
+    ACCESSORIES: 'accessories'
+}
+
 export const PAGINATION = {
     DEFAULT_PAGE_SIZE: 20,
     PAGE_SIZE_OPTIONS: [10, 20, 50, 100],

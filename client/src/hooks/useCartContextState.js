@@ -119,7 +119,7 @@ export function useCartContextState() {
     // PUBLIC ACTIONS
     // ============================================
 
-    const addToCart = useCallback(async (productId, quantity = 1, productData) => {
+    const addToCart = useCallback(async (productId, quantity = 1, productData, options = {}) => {
         try {
             let result;
 
@@ -164,13 +164,17 @@ export function useCartContextState() {
             if (productData) {
                 trackAddToCart(productData, quantity, user);
             }
-            window.dispatchEvent(new CustomEvent('openMiniCart', {
-                detail: {
-                    newItem: true,
-                    product: productData,
-                    quantity: quantity
-                },
-            }));
+
+            if (!options.silent) {
+                window.dispatchEvent(new CustomEvent('openMiniCart', {
+                    detail: {
+                        newItem: true,
+                        product: productData,
+                        quantity: quantity
+                    },
+                }));
+            }
+
             return result;
 
         } catch (error) {

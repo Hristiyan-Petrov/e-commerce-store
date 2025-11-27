@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Stack, Divider, IconButton, Avatar } from '@mui/material';
+import { Box, Button, Typography, Stack, Divider, IconButton, Avatar, Grid, Skeleton } from '@mui/material';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { useNavigate } from 'react-router';
@@ -7,19 +7,22 @@ import { useState, useEffect } from 'react';
 import { useCart } from '../../../../context/CartContext';
 import { ROUTES } from '../../../../constants/routes';
 import AppDrawer from '../../../../components/common/AppDrawer';
+import productApi from '../../../../api/product';
+import DrawerRecommendationCard from '../../../../components/common/DrawerRecommendationCard';
 
 export default function AddedToCartDrawer({
-    open,   // Receive open prop from NavigationMenus
-    toggle, // Receive toggle prop from NavigationMenus
-    ...props 
+    open,
+    toggle,
+    ...props
 }) {
     const [isOpen, setIsOpen] = useState(open);
     const [lastAddedItem, setLastAddedItem] = useState(null);
-    
-    const { summary } = useCart();
+    const [recommendations, setRecommendations] = useState([]);
+    const [loadingRecs, setLoadingRecs] = useState(false);
+
+    const { summary, addToCart, cartItems } = useCart();
     const navigate = useNavigate();
 
-    // Sync internal state when parent prop changes (e.g. clicking Navbar Icon)
     useEffect(() => {
         setIsOpen(open);
     }, [open]);
@@ -27,23 +30,44 @@ export default function AddedToCartDrawer({
     useEffect(() => {
         const handleOpen = (e) => {
             const { newItem, product, quantity } = e.detail || {};
-            
             if (newItem && product) {
-                setLastAddedItem({
-                    ...product,
-                    quantity: quantity || 1
-                });
+                setLastAddedItem({ ...product, quantity: quantity || 1 });
                 requestAnimationFrame(() => setIsOpen(true));
             }
         };
-
         window.addEventListener('openMiniCart', handleOpen);
         return () => window.removeEventListener('openMiniCart', handleOpen);
     }, []);
 
+    useEffect(() => {
+        const fetchRecs = async () => {
+            if (!lastAddedItem?.id) return;
+            
+            setLoadingRecs(true); // Start loading
+            try {
+                const currentCartIds = cartItems.map(item => item.product.id);
+                if (!currentCartIds.includes(lastAddedItem.id)) {
+                    currentCartIds.push(lastAddedItem.id);
+                }
+                const response = await productApi.getAddedToCartRecommendations(lastAddedItem.id, currentCartIds);
+                setRecommendations(response.products || []);
+            } catch (err) {
+                console.error("Failed to load recommendations", err);
+                // On error, we just show 0 recommendations (section collapses)
+                setRecommendations([]);
+            } finally {
+                setLoadingRecs(false); // Stop loading
+            }
+        };
+
+        if (isOpen) {
+            fetchRecs();
+        }
+    }, [isOpen, lastAddedItem]);
+
     const handleClose = () => {
         setIsOpen(false);
-        if (toggle) toggle(); 
+        if (toggle) toggle();
     };
 
     const handleViewCart = () => {
@@ -59,12 +83,6 @@ export default function AddedToCartDrawer({
     const salePrice = lastAddedItem?.salePrice ? Number(lastAddedItem.salePrice) : null;
     const originalPrice = Number(lastAddedItem?.price);
     const displayPrice = salePrice !== null ? salePrice : originalPrice;
-    
-    const originalPriceStyle = {
-        textDecoration: salePrice !== null ? 'line-through' : 'none',
-        color: salePrice !== null ? 'text.secondary' : 'text.primary',
-        mr: 1,
-    };
 
     return (
         <AppDrawer
@@ -74,107 +92,115 @@ export default function AddedToCartDrawer({
             showCloseIcon={false}
             zIndex={(theme) => theme.zIndex.drawer + 2}
         >
-            {/* 1. SUCCESS HEADER */}
-            <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <CheckCircleOutlineRoundedIcon color="success" />
-                <Typography variant="subtitle1" fontWeight="bold">
-                    Added to Bag
-                </Typography>
-                <IconButton size="small" onClick={handleClose} sx={{ ml: 'auto' }}>
-                    <CloseRoundedIcon fontSize="small" />
-                </IconButton>
-            </Box>
-
-            {/* 2. THE ADDED ITEM */}
-            <Box sx={{ p: 3, overflowY: 'auto', flexGrow: 1 }}>
-                {lastAddedItem && (
-                    <Stack direction="row" spacing={3}> 
-                        <Avatar 
-                            variant="rounded" 
-                            src={lastAddedItem.imageUrl} 
-                            sx={{ width: 120, height: 120, bgcolor: 'action.hover' }}
-                        />
-                        <Box>
-                            <Typography 
-                                variant="subtitle1" 
-                                fontWeight="bold"
-                            >
-                                {lastAddedItem.name}
-                            </Typography>
-                            
-                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                                {salePrice !== null && (
-                                    <Typography 
-                                        variant="body2" 
-                                        sx={originalPriceStyle}
-                                    >
-                                        ${originalPrice.toFixed(2)}
-                                    </Typography>
-                                )}
-                                <Typography 
-                                    variant="body2" 
-                                    fontWeight="bold"
-                                    color={salePrice !== null ? 'error.main' : 'text.primary'}
-                                >
-                                    ${displayPrice.toFixed(2)}
-                                </Typography>
-                            </Box>
-                            
-                            <Typography 
-                                variant="body2" 
-                                color="text.secondary" 
-                                mt={1} 
-                            >
-                                Quantity: {lastAddedItem.quantity}
-                            </Typography>
-                        </Box>
-                    </Stack>
-                )}
-            </Box>
-
-            <Divider />
-
-            {/* 3. SUMMARY FOOTER */}
-            <Box 
-                sx={{ 
-                    p: 3, 
-                    bgcolor: 'background.default', 
-                }}
-            >
-                <Stack spacing={2}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body1">Cart Subtotal ({summary.itemCount} items)</Typography>
-                        <Typography variant="h6" fontWeight="bold">${summary.subtotal.toFixed(2)}</Typography>
-                    </Box>
-                    
-                    <Typography variant="caption" color="text.secondary">
-                        Shipping & taxes calculated at checkout.
+            <Box>
+                {/* Header */}
+                <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <CheckCircleOutlineRoundedIcon color="success" />
+                    <Typography variant="subtitle1" fontWeight="bold">
+                        Added to Bag
                     </Typography>
+                    <IconButton size="small" onClick={handleClose} sx={{ ml: 'auto' }}>
+                        <CloseRoundedIcon fontSize="small" />
+                    </IconButton>
+                </Box>
 
-                    <Button 
-                        variant="contained" 
-                        fullWidth 
-                        size="large" 
-                        onClick={handleCheckout}
-                    >
-                        Checkout
-                    </Button>
-                    <Button 
-                        variant="contained" 
-                        fullWidth 
-                        size="large" 
-                        onClick={handleViewCart}
-                        sx={{
-                            backgroundColor: 'secondary.main',
-                            color: '#fff',
-                            '&:hover': {
-                                backgroundColor: 'secondary.dark',
-                            }
-                        }}
-                    >
-                        View Cart ({summary.totalQuantity})
-                    </Button>
-                </Stack>
+                {/* Added Item */}
+                {lastAddedItem && (
+                    <Box sx={{ p: 3, pb: 2 }}>
+                        <Stack direction="row" spacing={2}>
+                            <Avatar
+                                variant="rounded"
+                                src={lastAddedItem.imageUrl}
+                                sx={{ width: 80, height: 80, bgcolor: 'action.hover' }}
+                            />
+                            <Box>
+                                <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
+                                    {lastAddedItem.name}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" display="block">
+                                    Qty: {lastAddedItem.quantity}
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                                    {salePrice !== null && (
+                                        <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'text.secondary' }}>
+                                            ${originalPrice.toFixed(2)}
+                                        </Typography>
+                                    )}
+                                    <Typography variant="body2" fontWeight="bold" color={salePrice ? 'error.main' : 'text.primary'}>
+                                        ${displayPrice.toFixed(2)}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Stack>
+                    </Box>
+                )}
+
+                {/* Buttons */}
+                <Box sx={{ px: 3, pb: 3 }}>
+                    <Stack spacing={1.5}>
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={handleCheckout}
+                            sx={{ py: 1.5 }}
+                        >
+                            Checkout (${summary.subtotal.toFixed(2)})
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            onClick={handleViewCart}
+                            sx={{ color: 'text.primary', borderColor: 'divider' }}
+                        >
+                            View Cart ({summary.totalQuantity})
+                        </Button>
+                    </Stack>
+                </Box>
+                <Divider /> 
+            </Box>
+
+            {/* Scrollable Content */}
+            <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
+                
+                {/* LOADING STATE */}
+                {loadingRecs ? (
+                    <Box sx={{ px: 3, py: 4 }}>
+                        {/* Title Skeleton */}
+                        <Skeleton variant="text" width={140} height={32} sx={{ mb: 2 }} />
+                        
+                        <Grid container spacing={2}>
+                            {[1, 2, 3, 4].map((i) => (
+                                <Grid item xs={6} key={i}>
+                                    {/* Image Skeleton */}
+                                    <Skeleton variant="rectangular" height={150} sx={{ borderRadius: 1, mb: 1 }} />
+                                    {/* Text Skeletons */}
+                                    <Skeleton variant="text" width="90%" />
+                                    <Skeleton variant="text" width="60%" />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Box>
+                ) : (
+                    /* LOADED STATE - Only show if we have results */
+                    recommendations.length > 0 && (
+                        <Box sx={{ px: 3, py: 2 }}>
+                            <Typography variant="subtitle1" fontWeight="800" gutterBottom sx={{ mb: 2 }}>
+                                You might also like
+                            </Typography>
+
+                            <Grid container spacing={2}>
+                                {recommendations.map((item) => (
+                                    <Grid item xs={6} key={item.id}>
+                                        <DrawerRecommendationCard
+                                            product={item}
+                                            onAdd={addToCart}
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    )
+                )}
             </Box>
         </AppDrawer>
     );

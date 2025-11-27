@@ -3,8 +3,19 @@ import { API_ENDPOINTS } from "../constants/api";
 import { api } from "./fetcher";
 
 export default {
-    getAll: () => api.get(API_ENDPOINTS.PRODUCTS.BASE),
+    getAll: (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return api.get(`${API_ENDPOINTS.PRODUCTS.BASE}?${queryString}`);
+    },
     getLatest: (limit = 4) => api.get(`${API_ENDPOINTS.PRODUCTS.LATEST}?limit=${limit}`),
+    getAddedToCartRecommendations: (productId, excludeIds = []) => {
+        let url = API_ENDPOINTS.PRODUCTS.ADDED_TO_CART_RECOMMENDATIONS(productId);
+        if (excludeIds.length > 0) {
+            url += `?exclude=${excludeIds.join(',')}`;
+        }
+        return api.get(url);
+    },
+
 
     // fetchLatest: async (limit = 5) => {
     //     try {

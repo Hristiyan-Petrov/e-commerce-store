@@ -35,14 +35,13 @@ module.exports = {
     addToCart: catchAsyncHandler(async (req, res) => {
         const userId = req.user.userId;
         const { productId, quantity = 1 } = req.body;
-
-        quantity = parseInt(quantity);
+        const parsedQuantity = parseInt(quantity);
 
         if (!productId) {
             throw new AppError('Product ID is required', 400)
         }
 
-        if (quantity < 1 || !Number.isInteger(quantity)) {
+        if (parsedQuantity < 1 || !Number.isInteger(parsedQuantity)) {
             throw new AppError('Quantity must be a positive integer', 400);
         }
 

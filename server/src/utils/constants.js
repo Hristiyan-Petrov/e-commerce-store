@@ -13,6 +13,15 @@ const OAUTH_PROVIDERS = {
     GITHUB: 'github',
 };
 
+const PRODUCT_CATEGORIES = {
+    UNCATEGORIZED: 'uncategorized',
+    KEYBOARDS: 'keyboards',
+    MICE: 'mice',
+    MONITORS: 'monitors',
+    AUDIO: 'audio',
+    ACCESSORIES: 'accessories',
+};
+
 const ENTITY_ENUMS = {
     USER: {
         ROLE: ['customer', 'admin'],
@@ -22,12 +31,13 @@ const ENTITY_ENUMS = {
         PROVIDER: Object.values(OAUTH_PROVIDERS),
     },
     PRODUCT: {
-        CATEGORY: ['uncategorized', 'keyboards', 'mice', 'monitors', 'audio', 'accessories'],
+        CATEGORY: Object.values(PRODUCT_CATEGORIES),
     }
 };
 
 module.exports = {
     ENTITY_NAMES,
     ENTITY_ENUMS,
-    OAUTH_PROVIDERS
+    OAUTH_PROVIDERS,
+    PRODUCT_CATEGORIES,
 };

@@ -26,11 +26,11 @@ export default function CartSummary({
                 <Typography variant="subtitle2" fontWeight="600" gutterBottom>
                     Promo Code
                 </Typography>
-                <Stack direction="row" spacing={1}>
+                <Stack direction="row" spacing={1} justifyContent='space-between'>
                     <TextField
                         size="small"
                         placeholder="Enter code"
-                        fullWidth
+                        // fullWidth
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -39,7 +39,7 @@ export default function CartSummary({
                             ),
                         }}
                     />
-                    <Button disabled={disabled} sx={{ backgroundColor: 'secondary.main', color: '#fff', '&:hover': { backgroundColor: 'primary.dark' } }}>
+                    <Button disabled={disabled} sx={{ backgroundColor: 'secondary.main', color: '#fff', letterSpacing: '1.5px', fontSize: '0.7rem' ,'&:hover': { backgroundColor: 'primary.dark' } }}>
                         Apply
                     </Button>
                 </Stack>
@@ -77,7 +77,7 @@ export default function CartSummary({
                 component={RouterLink}
                 to={ROUTES.CHECKOUT}
                 disabled={disabled}
-                sx={{ borderRadius: 50, height: 48 }}
+                sx={{ letterSpacing: '2.5px' }}
             >
                 Checkout
             </Button>

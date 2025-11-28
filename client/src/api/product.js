@@ -15,6 +15,8 @@ export default {
         }
         return api.get(url);
     },
+    getTrending: (limit = 4) => api.get(`${API_ENDPOINTS.PRODUCTS.TRENDING}?limit=${limit}`),
+    
 
 
     // fetchLatest: async (limit = 5) => {

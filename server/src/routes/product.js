@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get('/', productController.getAll);
 router.get('/latest', productController.getLatest);
+router.get('/trending', productController.getTrending);
 // router.get('/:id', productController.getOne);
 router.get('/:id/recommendations', productController.getRecommendations);
 

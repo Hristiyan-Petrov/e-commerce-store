@@ -3,9 +3,10 @@ const Product = require("../entities/Product");
 const productRepo = AppDataSource.getRepository(Product);
 const { Between, MoreThanOrEqual, LessThanOrEqual, Like } = require("typeorm");
 const { PRODUCT_CATEGORIES } = require('../utils/constants');
+const { getTrending } = require("../controllers/product");
 
 module.exports = {
-    findLatest: async (limit) => {
+    getLatest: async (limit) => {
         // Hard limit to prevent fetching too many rows if client sends large number
         const safeLimit = limit && limit > 0 ? Math.min(limit, 20) : 4;
 
@@ -15,11 +16,11 @@ module.exports = {
         });
     },
 
-    findAll: async () => {
+    getAll: async () => {
         const products = await productRepo.find();
         return { products }
     },
-    // findAll: async ({
+    // getAll: async ({
     //     page = 1,
     //     limit = 12,
     //     category,
@@ -77,7 +78,7 @@ module.exports = {
     //     };
     // },
 
-    findRelated: async (productId, options = {}) => {
+    getRelated: async (productId, options = {}) => {
         const { category, maxPrice, limit = 4, excludeIds = [] } = options;
 
         const query = productRepo.createQueryBuilder('product')
@@ -112,8 +113,8 @@ module.exports = {
             .getMany();
     },
 
-    findCartRecommendations: async (addedProductId, currentCartItemsIds) => {
-        return module.exports.findRelated(addedProductId, {
+    getCartRecommendations: async (addedProductId, currentCartItemsIds) => {
+        return module.exports.getRelated(addedProductId, {
             // category: PRODUCT_CATEGORIES.ACCESSORIES,
             limit: 6,
             maxPrice: 50,
@@ -121,5 +122,13 @@ module.exports = {
         });
     },
 
+    getTrending: async (limit) => {
+        // Must decide to get products with: Highest inventory / Highest order rate / Randomly
+        return await productRepo.createQueryBuilder('product')
+            // .where('product.inventory > 0')
+            .orderBy('RANDOM()')
+            .take(limit)
+            .getMany();
+    },
 
 };

@@ -9,7 +9,8 @@ module.exports = {
         if (req.query.limit && (limit < 1 || isNaN(limit))) {
             throw new AppError('Limit must be a positive integer', 400);
         }
-        const products = await productService.findLatest(limit);
+
+        const products = await productService.getLatest(limit);
         res.status(200).json({
             success: true,
             products
@@ -17,7 +18,7 @@ module.exports = {
     }),
 
     // getAll: catchAsyncHandler(async (req, res) => {
-    //     const products = await productService.findAll();
+    //     const products = await productService.getAll();
     //     res.status(200).json({
     //         success: true,
     //         products
@@ -41,7 +42,7 @@ module.exports = {
             maxPrice
         };
 
-        const result = await productService.findAll(filters);
+        const result = await productService.getAll(filters);
 
         res.json({
             success: true,
@@ -62,7 +63,18 @@ module.exports = {
                 .filter(id => !isNaN(id));
         }
 
-        const products = await productService.findCartRecommendations(productId, excludeIds);
+        const products = await productService.getCartRecommendations(productId, excludeIds);
+        res.json({ success: true, products });
+    }),
+
+    getTrending: catchAsyncHandler(async (req, res) => {
+        const limit = parseInt(req.query.limit, 10);
+
+        if (req.query.limit && (limit < 1 || isNaN(limit))) {
+            throw new AppError('Limit must be a positive integer', 400);
+        }
+
+        const products = await productService.getTrending(limit);
         res.json({ success: true, products });
     }),
 

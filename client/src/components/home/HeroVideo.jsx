@@ -4,56 +4,69 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router';
 
 // REPLACE THESE WITH YOUR REAL ASSETS
-// const VIDEO_SRC = "https://assets.mixkit.co/videos/preview/mixkit-gaming-keyboard-typing-lighting-40590-large.mp4"; // Placeholder
 const POSTER_SRC = "https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=1080&auto=format&fit=crop";
+
 const HeroVideo = () => {
     const navigate = useNavigate();
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
     const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+    const isWideScreen = useMediaQuery(theme.breakpoints.up('md'));
+    const isLandscape = useMediaQuery('(orientation: landscape)');
+    const isTablet = useMediaQuery('(min-width:600px) and (max-width:1200px) and (orientation: portrait)');
+
+    const showDesktopVideo = isWideScreen && isLandscape;
+
     const mobileVideo = '/assets/videos/hero-video-2-mobile.mp4';
     const desktopVideo = '/assets/videos/hero-video-2.mp4';
+    const activeVideoSrc = showDesktopVideo ? desktopVideo : mobileVideo;
 
     return (
-        <Box 
-            sx={{ 
-                position: 'relative', 
-                height: { xs: '85vh', md: '90vh' }, 
-                width: '100%', 
+        <Box
+            sx={{
+                position: 'relative',
+                height: {
+                    xs: '85vh',
+                    sm: '95vh',
+                },
+                width: '100%',
                 overflow: 'hidden',
-                bgcolor: 'black' 
+                bgcolor: 'black'
             }}
         >
-        {/* <Box sx={{ width: '100%', height: '100vh' }}> */}
             {/* Background Video */}
             <Box
                 component="video"
-                // key={}
+                // IMPORTANT: The 'key' forces React to completely re-render the element
+                // when the source changes. This prevents black screens on rotation.
+                key={activeVideoSrc}
+
                 autoPlay
                 loop
                 muted
                 playsInline
                 poster={POSTER_SRC}
                 onLoadedData={() => setIsVideoLoaded(true)}
-                src={isDesktop ? desktopVideo : mobileVideo}
-                // src={mobileVideo}
+                src={activeVideoSrc}
                 sx={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    opacity: isVideoLoaded ? 0.6 : 0, // Fade in once ready
-                    transition: 'opacity 1s ease-in-out',
-                    // zIndex: 0
-                }}
-            >
-                {/* <source src='/assets/videos/hero-video-2.mp4' type="video/mp4" /> */}
-            </Box>
 
-            {/* Gradient Overlay for Text Readability */}
+                    // The "Magic" responsive CSS
+                    objectFit: 'cover', // Ensures the video fills the box no matter what
+                    objectPosition: showDesktopVideo
+                        ? 'center center'
+                        : (isTablet ? 'center 25%' : 'center top'),
+
+                    opacity: isVideoLoaded ? 0.6 : 0,
+                    transition: 'opacity 1s ease-in-out',
+                }}
+            />
+
+            {/* Gradient Overlay */}
             <Box
                 sx={{
                     position: 'absolute',
@@ -61,8 +74,7 @@ const HeroVideo = () => {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    background: `linear-gradient(to top, ${alpha('#000', 0.8)} 0%, ${alpha('#000', 0.2)} 50%, ${alpha('#000', 0.4)} 100%)`,
-                    // zIndex: 1
+                    background: `linear-gradient(to top, ${alpha('#000', 0.9)} 0%, ${alpha('#000', 0.3)} 50%, ${alpha('#000', 0.3)} 100%)`,
                 }}
             />
 
@@ -71,14 +83,16 @@ const HeroVideo = () => {
                 maxWidth="xl"
                 sx={{
                     position: 'relative',
-                    // zIndex: 2, 
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'center',
+                    // justifyContent: 'center',
                     alignItems: { xs: 'center', md: 'flex-start' },
                     textAlign: { xs: 'center', md: 'left' },
-                    pt: 10
+                    pt: { xs: 10, md: 20 },
+                    pt: 10,
+                    justifyContent: { xs: 'center', md: 'center' },
+                    zIndex: 2
                 }}
             >
                 <motion.div
@@ -91,7 +105,7 @@ const HeroVideo = () => {
                         sx={{
                             color: 'white',
                             fontWeight: 900,
-                            fontSize: { xs: '3rem', md: '5rem', lg: '6.5rem' },
+                            fontSize: { xs: '2rem', sm: '3rem', md: '4rem', lg: '5rem' },
                             lineHeight: 0.9,
                             letterSpacing: '-0.02em',
                             mb: 2,
@@ -114,7 +128,8 @@ const HeroVideo = () => {
                             color: 'grey.300',
                             mb: 5,
                             maxWidth: '600px',
-                            fontWeight: 400
+                            fontWeight: 400,
+                            fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' }
                         }}
                     >
                         Experience the next generation of inputs. Engineered for professionals, designed for everyone.

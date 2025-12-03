@@ -49,7 +49,7 @@ const Navbar = () => {
             aria-label="Main navigation"
         >
             <Toolbar sx={{
-                justifyContent: { xs: "space-between", xl: 'space-evenly' },
+                justifyContent: "space-around",
             }}>
                 <PrimaryNavigation />
                 <NavigationIcons

@@ -22,19 +22,18 @@ export default function PrimaryNavigation() {
                 sx={{
                     display: 'flex', // Ensures no extra line-height spacing
                     textDecoration: 'none',
-                    '&:hover': { opacity: 0.8, transition: '0.2s' } 
+                    '&:hover': { opacity: 0.8, transition: '0.2s' }
                 }}
             >
                 <CardMedia
                     component="img"
-                    image='/assets/logo/perifix-logo.png' 
+                    image='/assets/logo/perifix-logo.png'
                     alt="Perifix logo"
                     sx={{
+                        ml: '30px',
                         pr: 2,
                         transform: 'scale(1.5)',
-                        height: 65, // Set height via sx for better responsiveness
-                        // width: 'auto', // Maintain aspect ratio
-                        // objectFit: 'contain', // Ensures logo doesn't stretch
+                        height: 65,
                     }}
                 />
             </Box>
